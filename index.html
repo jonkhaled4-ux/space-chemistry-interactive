@@ -308,15 +308,15 @@
             to { box-shadow: 0 0 40px rgba(255, 0, 85, 0.9); border-color: var(--neon-red); }
         }
 
-        /* تنسيق متناسق لصفحة ترتيب الطبقات خصيصاً لشاشات الآيفون والموبايل */
+        /* حاوية التحدي متناسقة تماماً مع شاشات الآيفون الصغيرة والكبيرة */
         .atmosphere-challenge-wrapper {
             display: flex;
             flex-direction: column;
             gap: 12px;
             width: 100%;
-            max-width: 650px;
+            max-width: 550px;
             align-items: center;
-            background: rgba(5, 12, 25, 0.85);
+            background: rgba(5, 12, 25, 0.9);
             padding: 15px;
             border-radius: 16px;
             border: 1px solid var(--border-glow);
@@ -331,7 +331,7 @@
         }
 
         .drop-slot {
-            min-height: 45px;
+            min-height: 42px;
             border: 2px dashed var(--neon-blue);
             background: rgba(0, 243, 255, 0.08);
             border-radius: 8px;
@@ -339,7 +339,7 @@
             align-items: center;
             justify-content: space-between;
             padding: 0 15px;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             color: #cbd5e1;
             font-weight: bold;
         }
@@ -360,13 +360,13 @@
         }
 
         .draggable-item {
-            padding: 10px 16px;
+            padding: 10px 14px;
             background: linear-gradient(135deg, rgba(0, 243, 255, 0.25) 0%, rgba(15, 23, 42, 0.95) 100%);
             border: 2px solid var(--neon-blue);
             border-radius: 8px;
             cursor: pointer;
             font-weight: bold;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             color: #fff;
             transition: all 0.2s ease;
             text-align: center;
@@ -734,8 +734,8 @@
             background: transparent;
             border: 2px solid var(--neon-blue);
             color: var(--neon-blue);
-            padding: 8px 25px;
-            font-size: 1rem;
+            padding: 8px 20px;
+            font-size: 0.95rem;
             font-family: 'Orbitron', 'Tajawal', sans-serif;
             cursor: pointer;
             border-radius: 5px;
@@ -889,12 +889,12 @@
         </div>
     </section>
 
-    <!-- SLIDE 2: صفحة ترتيب الطبقات المتوافقة كلياً مع اللمس والآيفون -->
+    <!-- SLIDE 2: صفحة ترتيب الطبقات المتوافقة 100% مع الآيفون وسفاري -->
     <section id="slide-2" class="slide">
         <canvas id="canvas-slide2" class="space-bg"></canvas>
         <div class="content-layer">
             <div class="atmosphere-challenge-wrapper">
-                <h3 style="font-size: clamp(0.95rem, 2vw, 1.15rem); text-align: center; color: var(--neon-blue);">🧪 ترتيب طبقات الغلاف الجوي (انقر على الطبقة لوضعها بالترتيب)</h3>
+                <h3 style="font-size: clamp(0.85rem, 1.8vw, 1.05rem); text-align: center; color: var(--neon-blue);">🧪 ترتيب طبقات الغلاف الجوي (انقر للتسكين بالترتيب)</h3>
                 
                 <div class="drop-zones" id="drop-zones">
                     <div class="drop-slot" data-index="0"><span>1. القريبة للأرض</span></div>
@@ -912,11 +912,11 @@
                     <div class="draggable-item" data-id="layer-stratosphere" onclick="selectLayer(this)">الستراتوسفير</div>
                 </div>
 
-                <div style="display: flex; gap: 10px; margin-top: 5px;">
+                <div style="display: flex; gap: 8px; margin-top: 5px;">
                     <button class="btn-action" onclick="checkAtmosphereOrder()">التحقق 🧪</button>
                     <button class="btn-action" onclick="resetAtmosphereOrder()" style="border-color: var(--neon-red); color: var(--neon-red);">إعادة 🔄</button>
                 </div>
-                <div id="slide2-status" style="font-weight: bold; min-height: 22px; font-size: 0.9rem; text-align: center;"></div>
+                <div id="slide2-status" style="font-weight: bold; min-height: 20px; font-size: 0.85rem; text-align: center;"></div>
             </div>
         </div>
     </section>
