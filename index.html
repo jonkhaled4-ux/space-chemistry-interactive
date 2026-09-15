@@ -470,6 +470,115 @@
             z-index: 120;
         }
 
+
+        /* =====================================================
+           واجهة ترتيب الغلاف الجوي للجوال / Safari iPhone
+           تعتمد على عناصر SELECT الأصلية، بلا سحب أو لمس مخصص
+           ===================================================== */
+        .mobile-atmosphere-ui {
+            display: none;
+            width: 100%;
+        }
+
+        .mobile-atmosphere-row {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 6px;
+            margin-bottom: 10px;
+        }
+
+        .mobile-atmosphere-row label {
+            color: #fff;
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-align: right;
+        }
+
+        .mobile-atmosphere-select {
+            display: block;
+            width: 100%;
+            min-height: 48px;
+            padding: 10px 12px;
+            border: 2px solid var(--neon-blue);
+            border-radius: 10px;
+            background-color: #0b1730;
+            color: #fff;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 16px; /* يمنع Safari من التكبير التلقائي عند فتح القائمة */
+            font-weight: 700;
+            direction: rtl;
+            touch-action: auto !important;
+            pointer-events: auto !important;
+            -webkit-user-select: auto !important;
+            user-select: auto !important;
+            -webkit-appearance: menulist;
+            appearance: menulist;
+            position: relative;
+            z-index: 500;
+        }
+
+        .mobile-atmosphere-select:focus {
+            outline: none;
+            border-color: var(--neon-gold);
+            box-shadow: 0 0 18px rgba(255, 170, 0, 0.45);
+        }
+
+        .mobile-atmosphere-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 12px;
+        }
+
+        .mobile-atmosphere-actions button {
+            min-height: 48px;
+            flex: 1;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 1rem;
+            touch-action: manipulation;
+            pointer-events: auto !important;
+            position: relative;
+            z-index: 500;
+        }
+
+        /* iPhone والهواتف: استخدم الواجهة الأصلية فقط */
+        @media (max-width: 1024px) {
+            #desktop-atmosphere-ui {
+                display: none !important;
+            }
+
+            .mobile-atmosphere-ui {
+                display: block !important;
+            }
+
+            #slide-2 {
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            #slide-2 .content-layer {
+                justify-content: flex-start;
+                padding-top: 10px;
+                padding-bottom: 30px;
+                z-index: 200;
+                pointer-events: auto !important;
+            }
+
+            #slide-2 .atmosphere-challenge-wrapper {
+                width: min(94vw, 560px);
+                max-width: 94vw;
+                margin: 0 auto;
+                padding: 14px;
+                pointer-events: auto !important;
+                position: relative;
+                z-index: 300;
+            }
+
+            #slide-2 canvas.space-bg {
+                pointer-events: none !important;
+            }
+        }
+
         .badges-container {
             display: flex;
             gap: 15px;
@@ -975,40 +1084,113 @@
         </div>
     </section>
 
-    <!-- SLIDE 2: ترتيب الطبقات - متوافق مع Safari على iPhone ومع السحب على الكمبيوتر -->
+    <!-- SLIDE 2: ترتيب طبقات الغلاف الجوي -->
     <section id="slide-2" class="slide">
         <canvas id="canvas-slide2" class="space-bg"></canvas>
+
         <div class="content-layer">
             <div class="atmosphere-challenge-wrapper">
-                <h3 style="font-size: clamp(0.85rem, 1.8vw, 1.05rem); text-align: center; color: var(--neon-blue);">
+                <h3 style="font-size: clamp(0.95rem, 2vw, 1.15rem); text-align:center; color:var(--neon-blue); margin-bottom:6px;">
                     🧪 ترتيب طبقات الغلاف الجوي
                 </h3>
-                <p style="font-size:0.78rem; color:#cbd5e1; text-align:center; line-height:1.5;">
-                    على الجوال: اختر الطبقة ثم اضغط على الخانة المطلوبة. وعلى الكمبيوتر يمكنك أيضًا السحب والإفلات.
+
+                <p style="font-size:0.82rem; color:#cbd5e1; text-align:center; line-height:1.6; margin-bottom:10px;">
+                    رتّب الطبقات من سطح الأرض إلى الفضاء.
                 </p>
 
-                <div class="drop-zones" id="drop-zones">
-                    <button type="button" class="drop-slot" data-index="0" onclick="handleAtmosphereSlotActivation(this)"><span>1. القريبة للأرض</span></button>
-                    <button type="button" class="drop-slot" data-index="1" onclick="handleAtmosphereSlotActivation(this)"><span>2. الطبقة الثانية</span></button>
-                    <button type="button" class="drop-slot" data-index="2" onclick="handleAtmosphereSlotActivation(this)"><span>3. الطبقة الثالثة</span></button>
-                    <button type="button" class="drop-slot" data-index="3" onclick="handleAtmosphereSlotActivation(this)"><span>4. الطبقة الرابعة</span></button>
-                    <button type="button" class="drop-slot" data-index="4" onclick="handleAtmosphereSlotActivation(this)"><span>5. الأبعد (الفضاء)</span></button>
+                <!-- واجهة الكمبيوتر: تظل كما هي بالنقر أو السحب -->
+                <div id="desktop-atmosphere-ui">
+                    <div class="drop-zones" id="drop-zones">
+                        <button type="button" class="drop-slot" data-index="0" onclick="handleAtmosphereSlotActivation(this)"><span>1. القريبة للأرض</span></button>
+                        <button type="button" class="drop-slot" data-index="1" onclick="handleAtmosphereSlotActivation(this)"><span>2. الطبقة الثانية</span></button>
+                        <button type="button" class="drop-slot" data-index="2" onclick="handleAtmosphereSlotActivation(this)"><span>3. الطبقة الثالثة</span></button>
+                        <button type="button" class="drop-slot" data-index="3" onclick="handleAtmosphereSlotActivation(this)"><span>4. الطبقة الرابعة</span></button>
+                        <button type="button" class="drop-slot" data-index="4" onclick="handleAtmosphereSlotActivation(this)"><span>5. الأبعد (الفضاء)</span></button>
+                    </div>
+
+                    <div class="drag-container" id="drag-container">
+                        <button type="button" class="draggable-item" id="layer-exosphere" data-id="layer-exosphere" onclick="selectAtmosphereLayer(this)">الإكسوسفير</button>
+                        <button type="button" class="draggable-item" id="layer-troposphere" data-id="layer-troposphere" onclick="selectAtmosphereLayer(this)">التروبوسفير</button>
+                        <button type="button" class="draggable-item" id="layer-thermosphere" data-id="layer-thermosphere" onclick="selectAtmosphereLayer(this)">الثرموسفير</button>
+                        <button type="button" class="draggable-item" id="layer-mesosphere" data-id="layer-mesosphere" onclick="selectAtmosphereLayer(this)">الميزوسفير</button>
+                        <button type="button" class="draggable-item" id="layer-stratosphere" data-id="layer-stratosphere" onclick="selectAtmosphereLayer(this)">الستراتوسفير</button>
+                    </div>
+
+                    <div style="display:flex; gap:8px; margin-top:10px;">
+                        <button type="button" class="btn-action" onclick="checkAtmosphereOrder()">التحقق 🧪</button>
+                        <button type="button" class="btn-action" onclick="resetAtmosphereOrder()" style="border-color:var(--neon-red); color:var(--neon-red);">إعادة 🔄</button>
+                    </div>
                 </div>
 
-                <div class="drag-container" id="drag-container">
-                    <button type="button" class="draggable-item" id="layer-exosphere" data-id="layer-exosphere" onclick="selectAtmosphereLayer(this)">الإكسوسفير</button>
-                    <button type="button" class="draggable-item" id="layer-troposphere" data-id="layer-troposphere" onclick="selectAtmosphereLayer(this)">التروبوسفير</button>
-                    <button type="button" class="draggable-item" id="layer-thermosphere" data-id="layer-thermosphere" onclick="selectAtmosphereLayer(this)">الثرموسفير</button>
-                    <button type="button" class="draggable-item" id="layer-mesosphere" data-id="layer-mesosphere" onclick="selectAtmosphereLayer(this)">الميزوسفير</button>
-                    <button type="button" class="draggable-item" id="layer-stratosphere" data-id="layer-stratosphere" onclick="selectAtmosphereLayer(this)">الستراتوسفير</button>
+                <!-- واجهة iPhone/Safari: قوائم اختيار أصلية -->
+                <div id="mobile-atmosphere-ui" class="mobile-atmosphere-ui">
+                    <div class="mobile-atmosphere-row">
+                        <label for="mobile-layer-0">1. الأقرب إلى سطح الأرض</label>
+                        <select id="mobile-layer-0" class="mobile-atmosphere-select">
+                            <option value="">— اختر الطبقة —</option>
+<option value="layer-troposphere">التروبوسفير</option>
+<option value="layer-stratosphere">الستراتوسفير</option>
+<option value="layer-mesosphere">الميزوسفير</option>
+<option value="layer-thermosphere">الثرموسفير</option>
+<option value="layer-exosphere">الإكسوسفير</option>
+                        </select>
+                    </div>
+
+                    <div class="mobile-atmosphere-row">
+                        <label for="mobile-layer-1">2. الطبقة الثانية</label>
+                        <select id="mobile-layer-1" class="mobile-atmosphere-select">
+                            <option value="">— اختر الطبقة —</option>
+<option value="layer-troposphere">التروبوسفير</option>
+<option value="layer-stratosphere">الستراتوسفير</option>
+<option value="layer-mesosphere">الميزوسفير</option>
+<option value="layer-thermosphere">الثرموسفير</option>
+<option value="layer-exosphere">الإكسوسفير</option>
+                        </select>
+                    </div>
+
+                    <div class="mobile-atmosphere-row">
+                        <label for="mobile-layer-2">3. الطبقة الثالثة</label>
+                        <select id="mobile-layer-2" class="mobile-atmosphere-select">
+                            <option value="">— اختر الطبقة —</option>
+<option value="layer-troposphere">التروبوسفير</option>
+<option value="layer-stratosphere">الستراتوسفير</option>
+<option value="layer-mesosphere">الميزوسفير</option>
+<option value="layer-thermosphere">الثرموسفير</option>
+<option value="layer-exosphere">الإكسوسفير</option>
+                        </select>
+                    </div>
+
+                    <div class="mobile-atmosphere-row">
+                        <label for="mobile-layer-3">4. الطبقة الرابعة</label>
+                        <select id="mobile-layer-3" class="mobile-atmosphere-select">
+                            <option value="">— اختر الطبقة —</option>
+<option value="layer-troposphere">التروبوسفير</option>
+<option value="layer-stratosphere">الستراتوسفير</option>
+<option value="layer-mesosphere">الميزوسفير</option>
+<option value="layer-thermosphere">الثرموسفير</option>
+<option value="layer-exosphere">الإكسوسفير</option>
+                        </select>
+                    </div>
+
+                    <div class="mobile-atmosphere-row">
+                        <label for="mobile-layer-4">5. الأبعد نحو الفضاء</label>
+                        <select id="mobile-layer-4" class="mobile-atmosphere-select">
+                            <option value="">— اختر الطبقة —</option>
+<option value="layer-troposphere">التروبوسفير</option>
+<option value="layer-stratosphere">الستراتوسفير</option>
+<option value="layer-mesosphere">الميزوسفير</option>
+<option value="layer-thermosphere">الثرموسفير</option>
+<option value="layer-exosphere">الإكسوسفير</option>
+                        </select>
+                    </div>
+
+                    <div class="mobile-atmosphere-actions">
+                        <button type="button" class="btn-action" onclick="checkAtmosphereOrder()">التحقق 🧪</button>
+                        <button type="button" class="btn-action" onclick="resetAtmosphereOrder()" style="border-color:var(--neon-red); color:var(--neon-red);">إعادة 🔄</button>
+                    </div>
                 </div>
 
-                <div style="display: flex; gap: 8px; margin-top: 5px;">
-                    <button type="button" class="btn-action" onclick="checkAtmosphereOrder()">التحقق 🧪</button>
-                    <button type="button" class="btn-action" onclick="resetAtmosphereOrder()" style="border-color: var(--neon-red); color: var(--neon-red);">إعادة 🔄</button>
-                </div>
-
-                <div id="slide2-status" style="font-weight: bold; min-height: 20px; font-size: 0.85rem; text-align: center;"></div>
+                <div id="slide2-status" style="font-weight:bold; min-height:24px; font-size:0.9rem; text-align:center; margin-top:10px;"></div>
             </div>
         </div>
     </section>
@@ -1973,6 +2155,10 @@
         }
     }
 
+    function isMobileAtmosphereMode() {
+        return window.matchMedia("(max-width: 1024px)").matches;
+    }
+
     function resetAtmosphereOrder() {
         playBeep(300, 'sine', 0.1);
         isSlide2Passed = false;
@@ -1981,6 +2167,13 @@
         const status = document.getElementById('slide2-status');
         if (status) status.innerText = "";
 
+        // إعادة واجهة الجوال الأصلية
+        for (let i = 0; i < 5; i++) {
+            const select = document.getElementById('mobile-layer-' + i);
+            if (select) select.selectedIndex = 0;
+        }
+
+        // إعادة واجهة الكمبيوتر
         document.querySelectorAll('.drop-slot').forEach((slot, idx) => {
             delete slot.dataset.layerId;
             slot.classList.remove('filled', 'target-ready');
@@ -1994,32 +2187,57 @@
         });
     }
 
-    function checkAtmosphereOrder() {
-        const slots = document.querySelectorAll('.drop-slot');
-        const currentOrder = Array.from(slots).map(slot => slot.dataset.layerId || null);
+    function getAtmosphereOrderForCheck() {
+        if (isMobileAtmosphereMode()) {
+            const result = [];
+            for (let i = 0; i < 5; i++) {
+                const select = document.getElementById('mobile-layer-' + i);
+                result.push(select ? select.value : "");
+            }
+            return result;
+        }
 
+        return Array.from(document.querySelectorAll('.drop-slot'))
+            .map(slot => slot.dataset.layerId || "");
+    }
+
+    function checkAtmosphereOrder() {
+        const currentOrder = getAtmosphereOrderForCheck();
         const statusDiv = document.getElementById('slide2-status');
+
+        if (!statusDiv) return;
 
         if (currentOrder.some(value => !value)) {
             playErrorSound();
             isSlide2Passed = false;
             statusDiv.style.color = "var(--neon-red)";
-            statusDiv.innerText = "❌ يرجى تعبئة جميع الخانات الخمس أولاً";
+            statusDiv.innerText = "❌ يرجى اختيار طبقة في كل خانة أولاً";
             return;
         }
 
-        const isCorrect = currentOrder.every((val, idx) => val === correctAtmosphereOrder[idx]);
+        // منع تكرار نفس الطبقة في أكثر من موضع
+        if (new Set(currentOrder).size !== 5) {
+            playErrorSound();
+            isSlide2Passed = false;
+            statusDiv.style.color = "var(--neon-red)";
+            statusDiv.innerText = "❌ لا يمكن استخدام الطبقة نفسها أكثر من مرة";
+            return;
+        }
+
+        const isCorrect = currentOrder.every(
+            (value, index) => value === correctAtmosphereOrder[index]
+        );
 
         if (isCorrect) {
             playSuccessSound();
             isSlide2Passed = true;
             statusDiv.style.color = "var(--neon-green)";
-            statusDiv.innerText = "✅ تم تصحيح المسار بنجاح! (اضغط متابعة الرحلة 🚀)";
+            statusDiv.innerText = "✅ PATH CORRECTED — تم تصحيح المسار. اضغط «متابعة الرحلة 🚀»";
         } else {
             playErrorSound();
             isSlide2Passed = false;
             statusDiv.style.color = "var(--neon-red)";
-            statusDiv.innerText = "❌ الترتيب غير صحيح. اضغط على أي خانة ممتلئة لإزالة طبقتها وتعديل الترتيب، أو استخدم «إعادة»";
+            statusDiv.innerText = "❌ INCORRECT ORDER — الترتيب غير صحيح، أعد المحاولة";
         }
     }
 
