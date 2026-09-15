@@ -1185,8 +1185,8 @@
                     </div>
 
                     <div class="mobile-atmosphere-actions">
-                        <button type="button" class="btn-action" onclick="checkAtmosphereOrder()">التحقق 🧪</button>
-                        <button type="button" class="btn-action" onclick="resetAtmosphereOrder()" style="border-color:var(--neon-red); color:var(--neon-red);">إعادة 🔄</button>
+                        <button type="button" class="btn-action" onclick="checkAtmosphereOrderMobile()">التحقق 🧪</button>
+                        <button type="button" class="btn-action" onclick="resetAtmosphereOrderMobile()" style="border-color:var(--neon-red); color:var(--neon-red);">إعادة 🔄</button>
                     </div>
                 </div>
 
@@ -2185,6 +2185,77 @@
         document.querySelectorAll('.draggable-item').forEach(item => {
             item.classList.remove('used', 'selected');
         });
+    }
+
+
+    function resetAtmosphereOrderMobile() {
+        playBeep(300, 'sine', 0.1);
+        isSlide2Passed = false;
+
+        for (let i = 0; i < 5; i++) {
+            const select = document.getElementById('mobile-layer-' + i);
+            if (select) {
+                select.value = "";
+                select.selectedIndex = 0;
+            }
+        }
+
+        const statusDiv = document.getElementById('slide2-status');
+        if (statusDiv) {
+            statusDiv.style.color = "var(--neon-blue)";
+            statusDiv.innerText = "";
+        }
+    }
+
+    function checkAtmosphereOrderMobile() {
+        const currentOrder = [];
+
+        for (let i = 0; i < 5; i++) {
+            const select = document.getElementById('mobile-layer-' + i);
+            currentOrder.push(select ? String(select.value).trim() : "");
+        }
+
+        const statusDiv = document.getElementById('slide2-status');
+        if (!statusDiv) return;
+
+        if (currentOrder.some(value => value === "")) {
+            playErrorSound();
+            isSlide2Passed = false;
+            statusDiv.style.color = "var(--neon-red)";
+            statusDiv.innerText = "❌ يرجى اختيار طبقة في كل خانة أولاً";
+            return;
+        }
+
+        if (new Set(currentOrder).size !== 5) {
+            playErrorSound();
+            isSlide2Passed = false;
+            statusDiv.style.color = "var(--neon-red)";
+            statusDiv.innerText = "❌ لا يمكن استخدام الطبقة نفسها أكثر من مرة";
+            return;
+        }
+
+        const correctMobileOrder = [
+            "layer-troposphere",
+            "layer-stratosphere",
+            "layer-mesosphere",
+            "layer-thermosphere",
+            "layer-exosphere"
+        ];
+
+        const isCorrect = currentOrder.length === correctMobileOrder.length &&
+            currentOrder.every((value, index) => value === correctMobileOrder[index]);
+
+        if (isCorrect) {
+            playSuccessSound();
+            isSlide2Passed = true;
+            statusDiv.style.color = "var(--neon-green)";
+            statusDiv.innerText = "✅ PATH CORRECTED — تم تصحيح المسار. اضغط «متابعة الرحلة 🚀»";
+        } else {
+            playErrorSound();
+            isSlide2Passed = false;
+            statusDiv.style.color = "var(--neon-red)";
+            statusDiv.innerText = "❌ INCORRECT ORDER — الترتيب غير صحيح، أعد المحاولة";
+        }
     }
 
     function getAtmosphereOrderForCheck() {
