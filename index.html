@@ -332,17 +332,32 @@
         }
 
         .drop-slot {
-            min-height: 42px;
+            min-height: 48px;
             border: 2px dashed var(--neon-blue);
             background: rgba(0, 243, 255, 0.08);
             border-radius: 8px;
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            padding: 0 15px;
-            font-size: 0.85rem;
+            justify-content: center;
+            padding: 8px 15px;
+            font-size: 0.9rem;
             color: #cbd5e1;
             font-weight: bold;
+            cursor: pointer;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-user-select: none;
+            user-select: none;
+            position: relative;
+        }
+
+        .drop-slot::after {
+            content: "اضغط هنا";
+            position: absolute;
+            left: 10px;
+            font-size: 0.68rem;
+            color: rgba(203, 213, 225, 0.55);
+            font-weight: 400;
         }
 
         .drop-slot.filled {
@@ -350,6 +365,17 @@
             border-color: var(--neon-green);
             background: rgba(0, 255, 102, 0.15);
             color: #fff;
+        }
+
+        .drop-slot.filled::after {
+            content: "اضغط للإزالة";
+            color: rgba(0, 255, 102, 0.8);
+        }
+
+        .drop-slot.target-ready {
+            border-color: var(--neon-gold);
+            box-shadow: 0 0 14px rgba(255, 170, 0, 0.45);
+            background: rgba(255, 170, 0, 0.12);
         }
 
         .drag-container {
@@ -362,6 +388,7 @@
 
         .draggable-item {
             padding: 12px 18px;
+            min-height: 46px;
             background: linear-gradient(135deg, rgba(0, 243, 255, 0.25) 0%, rgba(15, 23, 42, 0.95) 100%);
             border: 2px solid var(--neon-blue);
             border-radius: 8px;
@@ -372,6 +399,8 @@
             text-align: center;
             touch-action: manipulation;
             -webkit-tap-highlight-color: transparent;
+            -webkit-user-select: none;
+            user-select: none;
         }
 
         .draggable-item:active {
@@ -380,10 +409,45 @@
             transform: scale(0.96);
         }
 
+        .draggable-item.selected {
+            border-color: var(--neon-gold);
+            background: rgba(255, 170, 0, 0.24);
+            box-shadow: 0 0 18px rgba(255, 170, 0, 0.55);
+            transform: translateY(-2px);
+        }
+
         .draggable-item.used {
-            opacity: 0.25;
+            opacity: 0.28;
             pointer-events: none;
             transform: scale(0.95);
+        }
+
+        @supports (height: 100dvh) {
+            body, #viewport, .slide {
+                height: 100dvh;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .atmosphere-challenge-wrapper {
+                max-width: 94vw;
+                padding: 12px;
+                gap: 9px;
+            }
+
+            .drop-slot {
+                min-height: 44px;
+                font-size: 0.82rem;
+                padding-left: 72px;
+            }
+
+            .draggable-item {
+                padding: 10px 12px;
+                min-height: 42px;
+                font-size: 0.88rem;
+                flex: 1 1 calc(50% - 8px);
+                max-width: calc(50% - 4px);
+            }
         }
 
         .badges-container {
@@ -891,33 +955,39 @@
         </div>
     </section>
 
-    <!-- SLIDE 2: صفحة ترتيب الطبقات مع دعم كامل وسريع للنقر باللمس على الآيفون -->
+    <!-- SLIDE 2: ترتيب الطبقات - متوافق مع Safari على iPhone ومع السحب على الكمبيوتر -->
     <section id="slide-2" class="slide">
         <canvas id="canvas-slide2" class="space-bg"></canvas>
         <div class="content-layer">
             <div class="atmosphere-challenge-wrapper">
-                <h3 style="font-size: clamp(0.85rem, 1.8vw, 1.05rem); text-align: center; color: var(--neon-blue);">🧪 ترتيب طبقات الغلاف الجوي (انقر لتسكين الطبقات)</h3>
-                
+                <h3 style="font-size: clamp(0.85rem, 1.8vw, 1.05rem); text-align: center; color: var(--neon-blue);">
+                    🧪 ترتيب طبقات الغلاف الجوي
+                </h3>
+                <p style="font-size:0.78rem; color:#cbd5e1; text-align:center; line-height:1.5;">
+                    على الجوال: اختر الطبقة ثم اضغط على الخانة المطلوبة. وعلى الكمبيوتر يمكنك أيضًا السحب والإفلات.
+                </p>
+
                 <div class="drop-zones" id="drop-zones">
-                    <div class="drop-slot" data-index="0"><span>1. القريبة للأرض</span></div>
-                    <div class="drop-slot" data-index="1"><span>2. الطبقة الثانية</span></div>
-                    <div class="drop-slot" data-index="2"><span>3. الطبقة الثالثة</span></div>
-                    <div class="drop-slot" data-index="3"><span>4. الطبقة الرابعة</span></div>
-                    <div class="drop-slot" data-index="4"><span>5. الأبعد (الفضاء)</span></div>
+                    <div class="drop-slot" data-index="0" role="button" tabindex="0"><span>1. القريبة للأرض</span></div>
+                    <div class="drop-slot" data-index="1" role="button" tabindex="0"><span>2. الطبقة الثانية</span></div>
+                    <div class="drop-slot" data-index="2" role="button" tabindex="0"><span>3. الطبقة الثالثة</span></div>
+                    <div class="drop-slot" data-index="3" role="button" tabindex="0"><span>4. الطبقة الرابعة</span></div>
+                    <div class="drop-slot" data-index="4" role="button" tabindex="0"><span>5. الأبعد (الفضاء)</span></div>
                 </div>
 
                 <div class="drag-container" id="drag-container">
-                    <div class="draggable-item" data-id="layer-exosphere" ontouchstart="selectLayer(event, this)" onclick="selectLayer(event, this)">الإكسوسفير</div>
-                    <div class="draggable-item" data-id="layer-troposphere" ontouchstart="selectLayer(event, this)" onclick="selectLayer(event, this)">التروبوسفير</div>
-                    <div class="draggable-item" data-id="layer-thermosphere" ontouchstart="selectLayer(event, this)" onclick="selectLayer(event, this)">الثرموسفير</div>
-                    <div class="draggable-item" data-id="layer-mesosphere" ontouchstart="selectLayer(event, this)" onclick="selectLayer(event, this)">الميزوسفير</div>
-                    <div class="draggable-item" data-id="layer-stratosphere" ontouchstart="selectLayer(event, this)" onclick="selectLayer(event, this)">الستراتوسفير</div>
+                    <div class="draggable-item" id="layer-exosphere" data-id="layer-exosphere" draggable="true" role="button" tabindex="0">الإكسوسفير</div>
+                    <div class="draggable-item" id="layer-troposphere" data-id="layer-troposphere" draggable="true" role="button" tabindex="0">التروبوسفير</div>
+                    <div class="draggable-item" id="layer-thermosphere" data-id="layer-thermosphere" draggable="true" role="button" tabindex="0">الثرموسفير</div>
+                    <div class="draggable-item" id="layer-mesosphere" data-id="layer-mesosphere" draggable="true" role="button" tabindex="0">الميزوسفير</div>
+                    <div class="draggable-item" id="layer-stratosphere" data-id="layer-stratosphere" draggable="true" role="button" tabindex="0">الستراتوسفير</div>
                 </div>
 
                 <div style="display: flex; gap: 8px; margin-top: 5px;">
-                    <button class="btn-action" ontouchstart="checkAtmosphereOrder()" onclick="checkAtmosphereOrder()">التحقق 🧪</button>
-                    <button class="btn-action" ontouchstart="resetAtmosphereOrder()" onclick="resetAtmosphereOrder()" style="border-color: var(--neon-red); color: var(--neon-red);">إعادة 🔄</button>
+                    <button type="button" class="btn-action" onclick="checkAtmosphereOrder()">التحقق 🧪</button>
+                    <button type="button" class="btn-action" onclick="resetAtmosphereOrder()" style="border-color: var(--neon-red); color: var(--neon-red);">إعادة 🔄</button>
                 </div>
+
                 <div id="slide2-status" style="font-weight: bold; min-height: 20px; font-size: 0.85rem; text-align: center;"></div>
             </div>
         </div>
@@ -1667,70 +1737,301 @@
         'layer-exosphere'
     ];
 
-    // استجابة فورية لأحداث اللمس والنقر على الآيفون والمتصفحات
-    function selectLayer(event, itemElem) {
-        if (event) {
-            event.preventDefault();
-            event.stopPropagation();
-        }
-        if (itemElem.classList.contains('used')) return;
+    // =========================================================
+    // ترتيب طبقات الغلاف الجوي
+    // متوافق مع Safari على iPhone + Chrome/Edge + السحب بالماوس
+    // =========================================================
 
-        const slots = document.querySelectorAll('.drop-slot');
-        for (let slot of slots) {
-            if (!slot.dataset.layerId) {
-                slot.dataset.layerId = itemElem.dataset.id;
-                slot.querySelector('span').innerText = itemElem.innerText;
-                slot.classList.add('filled');
-                itemElem.classList.add('used');
-                playBeep(600, 'sine', 0.08);
-                break;
-            }
+    let selectedAtmosphereItem = null;
+    let draggedAtmosphereItem = null;
+
+    const atmosphereDefaultNames = [
+        "1. القريبة للأرض",
+        "2. الطبقة الثانية",
+        "3. الطبقة الثالثة",
+        "4. الطبقة الرابعة",
+        "5. الأبعد (الفضاء)"
+    ];
+
+    function getAtmosphereItemById(layerId) {
+        return document.querySelector('.draggable-item[data-id="' + layerId + '"]');
+    }
+
+    function clearAtmosphereSelection() {
+        selectedAtmosphereItem = null;
+
+        document.querySelectorAll('.draggable-item').forEach(item => {
+            item.classList.remove('selected');
+        });
+
+        document.querySelectorAll('.drop-slot').forEach(slot => {
+            slot.classList.remove('target-ready');
+        });
+    }
+
+    function selectAtmosphereLayer(itemElem) {
+        if (!itemElem || itemElem.classList.contains('used')) return;
+
+        if (selectedAtmosphereItem === itemElem) {
+            clearAtmosphereSelection();
+            return;
         }
+
+        document.querySelectorAll('.draggable-item').forEach(item => {
+            item.classList.remove('selected');
+        });
+
+        selectedAtmosphereItem = itemElem;
+        itemElem.classList.add('selected');
+
+        document.querySelectorAll('.drop-slot').forEach(slot => {
+            slot.classList.add('target-ready');
+        });
+
+        const statusDiv = document.getElementById('slide2-status');
+        if (statusDiv) {
+            statusDiv.style.color = "var(--neon-gold)";
+            statusDiv.innerText = "تم اختيار «" + itemElem.innerText + "» — اضغط الآن على الخانة المطلوبة";
+        }
+
+        playBeep(600, 'sine', 0.08);
+    }
+
+    function releaseLayerFromSlot(slot, silent = false) {
+        if (!slot || !slot.dataset.layerId) return;
+
+        const oldId = slot.dataset.layerId;
+        const oldItem = getAtmosphereItemById(oldId);
+
+        if (oldItem) {
+            oldItem.classList.remove('used', 'selected');
+        }
+
+        delete slot.dataset.layerId;
+        slot.classList.remove('filled', 'target-ready');
+
+        const idx = Number(slot.dataset.index);
+        const label = slot.querySelector('span');
+        if (label && atmosphereDefaultNames[idx]) {
+            label.innerText = atmosphereDefaultNames[idx];
+        }
+
+        isSlide2Passed = false;
+
+        if (!silent) {
+            const statusDiv = document.getElementById('slide2-status');
+            if (statusDiv) {
+                statusDiv.style.color = "var(--neon-blue)";
+                statusDiv.innerText = "تمت إزالة الطبقة من الخانة، ويمكنك اختيارها من جديد";
+            }
+            playBeep(380, 'sine', 0.07);
+        }
+    }
+
+    function placeAtmosphereLayer(itemElem, slot) {
+        if (!itemElem || !slot) return;
+
+        if (slot.dataset.layerId && slot.dataset.layerId !== itemElem.dataset.id) {
+            releaseLayerFromSlot(slot, true);
+        }
+
+        document.querySelectorAll('.drop-slot').forEach(otherSlot => {
+            if (otherSlot !== slot && otherSlot.dataset.layerId === itemElem.dataset.id) {
+                releaseLayerFromSlot(otherSlot, true);
+            }
+        });
+
+        slot.dataset.layerId = itemElem.dataset.id;
+
+        const label = slot.querySelector('span');
+        if (label) label.innerText = itemElem.innerText;
+
+        slot.classList.add('filled');
+        itemElem.classList.add('used');
+        itemElem.classList.remove('selected');
+
+        clearAtmosphereSelection();
+        isSlide2Passed = false;
+
+        const statusDiv = document.getElementById('slide2-status');
+        if (statusDiv) {
+            statusDiv.style.color = "var(--neon-green)";
+            statusDiv.innerText = "تم وضع «" + itemElem.innerText + "» في الخانة رقم " + (Number(slot.dataset.index) + 1);
+        }
+
+        playBeep(700, 'sine', 0.08);
+    }
+
+    function handleAtmosphereSlotActivation(slot) {
+        if (!slot) return;
+
+        if (selectedAtmosphereItem) {
+            placeAtmosphereLayer(selectedAtmosphereItem, slot);
+            return;
+        }
+
+        if (slot.dataset.layerId) {
+            releaseLayerFromSlot(slot);
+        }
+    }
+
+    function initAtmosphereControls() {
+        const items = document.querySelectorAll('.draggable-item');
+        const slots = document.querySelectorAll('.drop-slot');
+
+        // Pointer Events: تعمل على Safari الحديث وChrome/Edge
+        if (window.PointerEvent) {
+            items.forEach(item => {
+                item.addEventListener('pointerup', function (event) {
+                    if (draggedAtmosphereItem) return;
+                    event.preventDefault();
+                    event.stopPropagation();
+                    selectAtmosphereLayer(this);
+                }, { passive: false });
+            });
+
+            slots.forEach(slot => {
+                slot.addEventListener('pointerup', function (event) {
+                    if (draggedAtmosphereItem) return;
+                    event.preventDefault();
+                    event.stopPropagation();
+                    handleAtmosphereSlotActivation(this);
+                }, { passive: false });
+            });
+        } else {
+            // دعم احتياطي لسفاري الأقدم
+            items.forEach(item => {
+                item.addEventListener('click', function (event) {
+                    event.preventDefault();
+                    selectAtmosphereLayer(this);
+                });
+            });
+
+            slots.forEach(slot => {
+                slot.addEventListener('click', function (event) {
+                    event.preventDefault();
+                    handleAtmosphereSlotActivation(this);
+                });
+            });
+        }
+
+        // لوحة المفاتيح + السحب على الكمبيوتر
+        items.forEach(item => {
+            item.addEventListener('keydown', function (event) {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    selectAtmosphereLayer(this);
+                }
+            });
+
+            item.addEventListener('dragstart', function (event) {
+                if (this.classList.contains('used')) {
+                    event.preventDefault();
+                    return;
+                }
+
+                draggedAtmosphereItem = this;
+                clearAtmosphereSelection();
+
+                try {
+                    event.dataTransfer.effectAllowed = 'move';
+                    event.dataTransfer.setData('text/plain', this.dataset.id);
+                } catch (e) {}
+            });
+
+            item.addEventListener('dragend', function () {
+                setTimeout(() => {
+                    draggedAtmosphereItem = null;
+                }, 60);
+
+                document.querySelectorAll('.drop-slot').forEach(slot => {
+                    slot.classList.remove('target-ready');
+                });
+            });
+        });
+
+        slots.forEach(slot => {
+            slot.addEventListener('keydown', function (event) {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    handleAtmosphereSlotActivation(this);
+                }
+            });
+
+            slot.addEventListener('dragover', function (event) {
+                event.preventDefault();
+                this.classList.add('target-ready');
+
+                try {
+                    event.dataTransfer.dropEffect = 'move';
+                } catch (e) {}
+            });
+
+            slot.addEventListener('dragleave', function () {
+                this.classList.remove('target-ready');
+            });
+
+            slot.addEventListener('drop', function (event) {
+                event.preventDefault();
+                event.stopPropagation();
+                this.classList.remove('target-ready');
+
+                let item = draggedAtmosphereItem;
+
+                if (!item) {
+                    try {
+                        const id = event.dataTransfer.getData('text/plain');
+                        item = getAtmosphereItemById(id);
+                    } catch (e) {}
+                }
+
+                if (item) {
+                    placeAtmosphereLayer(item, this);
+                }
+
+                setTimeout(() => {
+                    draggedAtmosphereItem = null;
+                }, 60);
+            });
+        });
     }
 
     function resetAtmosphereOrder() {
         playBeep(300, 'sine', 0.1);
         isSlide2Passed = false;
-        document.getElementById('slide2-status').innerText = "";
-        
+        clearAtmosphereSelection();
+
+        const status = document.getElementById('slide2-status');
+        if (status) status.innerText = "";
+
         document.querySelectorAll('.drop-slot').forEach((slot, idx) => {
-            slot.removeAttribute('data-layer-id');
-            slot.classList.remove('filled');
-            const defaultNames = [
-                "1. القريبة للأرض",
-                "2. الطبقة الثانية",
-                "3. الطبقة الثالثة",
-                "4. الطبقة الرابعة",
-                "5. الأبعد (الفضاء)"
-            ];
-            slot.querySelector('span').innerText = defaultNames[idx];
+            delete slot.dataset.layerId;
+            slot.classList.remove('filled', 'target-ready');
+
+            const label = slot.querySelector('span');
+            if (label) label.innerText = atmosphereDefaultNames[idx];
         });
 
         document.querySelectorAll('.draggable-item').forEach(item => {
-            item.classList.remove('used');
+            item.classList.remove('used', 'selected');
         });
     }
 
     function checkAtmosphereOrder() {
         const slots = document.querySelectorAll('.drop-slot');
-        let currentOrder = [];
-        slots.forEach(slot => {
-            if (slot.dataset.layerId) {
-                currentOrder.push(slot.dataset.layerId);
-            }
-        });
+        const currentOrder = Array.from(slots).map(slot => slot.dataset.layerId || null);
 
         const statusDiv = document.getElementById('slide2-status');
 
-        if (currentOrder.length < 5) {
+        if (currentOrder.some(value => !value)) {
             playErrorSound();
             isSlide2Passed = false;
             statusDiv.style.color = "var(--neon-red)";
-            statusDiv.innerText = "❌ يرجى اختيار وتعبئة كافة الطبقات أولاً";
+            statusDiv.innerText = "❌ يرجى تعبئة جميع الخانات الخمس أولاً";
             return;
         }
 
-        let isCorrect = currentOrder.every((val, idx) => val === correctAtmosphereOrder[idx]);
+        const isCorrect = currentOrder.every((val, idx) => val === correctAtmosphereOrder[idx]);
 
         if (isCorrect) {
             playSuccessSound();
@@ -1741,8 +2042,14 @@
             playErrorSound();
             isSlide2Passed = false;
             statusDiv.style.color = "var(--neon-red)";
-            statusDiv.innerText = "❌ الترتيب غير صحيح، اضغط (إعادة 🔄) وحاول مجدداً";
+            statusDiv.innerText = "❌ الترتيب غير صحيح. اضغط على أي خانة ممتلئة لإزالة طبقتها وتعديل الترتيب، أو استخدم «إعادة»";
         }
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initAtmosphereControls);
+    } else {
+        initAtmosphereControls();
     }
 
     const questions = [
