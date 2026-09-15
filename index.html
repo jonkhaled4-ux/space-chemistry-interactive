@@ -1,0 +1,2447 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>الكيمياء في الفضاء - قمرة القيادة المتقدمة</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #030712;
+            --neon-blue: #00f3ff;
+            --neon-red: #ff0055;
+            --neon-green: #00ff66;
+            --neon-gold: #ffaa00;
+            --panel-bg: rgba(5, 12, 25, 0.92);
+            --border-glow: rgba(0, 243, 255, 0.4);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: #fff;
+            font-family: 'Tajawal', sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: fixed;
+            inset: 0;
+        }
+
+        #viewport {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            background: #000;
+            overflow: hidden;
+        }
+
+        #start-overlay {
+            position: absolute;
+            inset: 0;
+            z-index: 999;
+            background: radial-gradient(circle, #0b1329 0%, #030712 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .btn-start-exp {
+            background: var(--neon-red);
+            color: #fff;
+            border: none;
+            padding: 18px 38px;
+            font-size: clamp(1.2rem, 3vw, 1.5rem);
+            font-family: 'Tajawal', sans-serif;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 0 30px var(--neon-red);
+            animation: pulse-start 1s infinite alternate;
+            transition: transform 0.2s;
+        }
+
+        .btn-start-exp:hover {
+            transform: scale(1.1);
+        }
+
+        @keyframes pulse-start {
+            from { box-shadow: 0 0 10px var(--neon-red); }
+            to { box-shadow: 0 0 40px var(--neon-red); }
+        }
+
+        .global-controls {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            right: 15px;
+            z-index: 200;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            pointer-events: none;
+        }
+
+        .slide-indicator {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-blue);
+            background: rgba(0, 0, 0, 0.65);
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid var(--border-glow);
+            letter-spacing: 2px;
+            font-size: clamp(0.75rem, 2vw, 0.9rem);
+        }
+
+        .btn-audio-toggle {
+            pointer-events: auto;
+            background: rgba(0, 243, 255, 0.1);
+            border: 1px solid var(--neon-blue);
+            color: var(--neon-blue);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            backdrop-filter: blur(5px);
+            transition: all 0.3s;
+        }
+
+        .btn-audio-toggle:hover {
+            background: var(--neon-blue);
+            color: #000;
+        }
+
+        .btn-next-step {
+            pointer-events: auto;
+            background: rgba(0, 243, 255, 0.15);
+            border: 1px solid var(--neon-blue);
+            color: #fff;
+            padding: 8px 18px;
+            font-size: clamp(0.9rem, 2vw, 1rem);
+            font-family: 'Tajawal', sans-serif;
+            font-weight: bold;
+            border-radius: 30px;
+            cursor: pointer;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.2);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-next-step:hover {
+            background: var(--neon-blue);
+            color: #000;
+            box-shadow: 0 0 25px var(--neon-blue);
+            transform: scale(1.05);
+        }
+
+        .shake {
+            animation: shake 0.2s cubic-bezier(.36,.07,.19,.97) infinite;
+        }
+
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-2px, 0, 0); }
+            20%, 80% { transform: translate3d(4px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
+            40%, 60% { transform: translate3d(6px, 0, 0); }
+        }
+
+        .slide {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 1s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 1.5rem;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .slide.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        canvas.space-bg {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .content-layer {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #earth-simulation-canvas {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .hud-overlay {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 5;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 75px 25px 25px 25px;
+            box-sizing: border-box;
+            font-family: 'Orbitron', monospace;
+            font-size: clamp(0.7rem, 1.5vw, 0.85rem);
+            color: var(--neon-blue);
+        }
+
+        .hud-box {
+            background: rgba(3, 7, 18, 0.75);
+            border: 1px solid var(--border-glow);
+            padding: 12px 16px;
+            border-radius: 8px;
+            backdrop-filter: blur(5px);
+            line-height: 1.7;
+            max-width: 260px;
+        }
+
+        .hud-box h4 {
+            color: #fff;
+            margin-bottom: 6px;
+            font-size: 0.9rem;
+            border-bottom: 1px solid rgba(0, 243, 255, 0.3);
+            padding-bottom: 4px;
+        }
+
+        .alert-box {
+            background: rgba(255, 0, 85, 0.15);
+            border: 2px solid var(--neon-red);
+            box-shadow: 0 0 20px rgba(255, 0, 85, 0.4);
+            padding: 25px 35px;
+            border-radius: 12px;
+            text-align: center;
+            animation: border-pulse 0.8s infinite alternate;
+            max-width: 90%;
+        }
+
+        .flash-text {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-red);
+            font-size: clamp(1.8rem, 4vw, 2.8rem);
+            font-weight: 900;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+            animation: text-flash 0.5s infinite alternate;
+        }
+
+        .flash-subtext {
+            letter-spacing: 2px;
+            color: #fff;
+            font-size: clamp(1.2rem, 3vw, 1.8rem);
+            font-family: 'Orbitron';
+            font-weight: bold;
+            animation: text-flash 0.5s infinite alternate;
+            animation-delay: 0.25s;
+        }
+
+        .flash-green-text {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-green);
+            animation: text-flash-green 0.6s infinite alternate;
+        }
+
+        @keyframes text-flash-green {
+            0% { opacity: 0.2; text-shadow: 0 0 0px transparent; }
+            100% { opacity: 1; text-shadow: 0 0 20px var(--neon-green), 0 0 40px var(--neon-green); }
+        }
+
+        .en-text {
+            direction: ltr;
+            display: inline-block;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        @keyframes text-flash {
+            0% { opacity: 0.1; text-shadow: 0 0 0px transparent; }
+            100% { opacity: 1; text-shadow: 0 0 20px var(--neon-red), 0 0 40px var(--neon-red); }
+        }
+
+        @keyframes border-pulse {
+            from { box-shadow: 0 0 10px rgba(255, 0, 85, 0.2); border-color: rgba(255, 0, 85, 0.4); }
+            to { box-shadow: 0 0 40px rgba(255, 0, 85, 0.9); border-color: var(--neon-red); }
+        }
+
+        .atmosphere-challenge-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            width: 100%;
+            max-width: 1100px;
+            align-items: center;
+            padding: 10px;
+        }
+
+        .drop-zones {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 12px;
+            width: 100%;
+            direction: rtl;
+        }
+
+        .drop-slot {
+            min-height: 90px;
+            border: 2px dashed var(--neon-blue);
+            background: rgba(0, 243, 255, 0.08);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            color: #cbd5e1;
+            font-weight: bold;
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.1);
+            transition: all 0.3s;
+            text-align: center;
+            padding: 8px;
+        }
+
+        .drop-slot.hovered {
+            background: rgba(0, 255, 102, 0.25);
+            border-style: solid;
+            border-color: var(--neon-green);
+            box-shadow: 0 0 25px var(--neon-green);
+            transform: scale(1.02);
+        }
+
+        .drag-container {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+            width: 100%;
+            min-height: 70px;
+        }
+
+        .draggable-item {
+            padding: 12px 20px;
+            background: linear-gradient(135deg, rgba(0, 243, 255, 0.25) 0%, rgba(15, 23, 42, 0.95) 100%);
+            border: 2px solid var(--neon-blue);
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.3);
+            border-radius: 10px;
+            cursor: grab;
+            font-weight: bold;
+            font-size: 1rem;
+            color: #fff;
+            touch-action: none;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .draggable-item:hover {
+            border-color: var(--neon-green);
+            box-shadow: 0 0 25px var(--neon-green);
+            transform: translateY(-3px);
+        }
+
+        .draggable-item:active {
+            cursor: grabbing;
+        }
+
+        .badges-container {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .mission-badge {
+            background: rgba(0, 243, 255, 0.1);
+            border: 2px solid var(--neon-blue);
+            padding: 10px 18px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-blue);
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            animation: badge-glow 1.5s infinite alternate;
+        }
+
+        @keyframes badge-glow {
+            from { box-shadow: 0 0 5px rgba(0, 243, 255, 0.3); }
+            to { box-shadow: 0 0 20px rgba(0, 243, 255, 0.8); }
+        }
+
+        .cockpit-dashboard {
+            position: absolute;
+            inset: 0;
+            z-index: 25;
+            background: radial-gradient(circle, rgba(2, 6, 23, 0.4) 30%, rgba(2, 6, 23, 0.95) 85%), 
+                        linear-gradient(135deg, rgba(0,243,255,0.03) 0%, rgba(255,0,85,0.03) 100%);
+            border: 18px solid #080f1e;
+            border-top: 25px solid #080f1e;
+            border-radius: 24px;
+            box-shadow: inset 0 0 50px rgba(0, 243, 255, 0.25);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 30px;
+            pointer-events: none;
+        }
+
+        .cockpit-header-hud {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px dashed rgba(0, 243, 255, 0.3);
+            padding-bottom: 12px;
+            pointer-events: auto;
+        }
+
+        .cockpit-panel-container {
+            pointer-events: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+            max-width: 850px;
+            margin: 0 auto;
+        }
+
+        .cockpit-panel {
+            background: rgba(3, 8, 18, 0.92);
+            border: 2px solid var(--neon-blue);
+            box-shadow: 0 0 30px rgba(0, 243, 255, 0.3), inset 0 0 15px rgba(0, 243, 255, 0.1);
+            padding: 18px 25px;
+            border-radius: 16px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            backdrop-filter: blur(12px);
+        }
+
+        .cockpit-btn {
+            background: linear-gradient(180deg, rgba(255,0,85,0.2) 0%, rgba(100,0,30,0.4) 100%);
+            border: 2px solid var(--neon-red);
+            color: #fff;
+            padding: 14px 26px;
+            border-radius: 10px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: bold;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 0 15px rgba(255, 0, 85, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .cockpit-btn.active {
+            background: linear-gradient(180deg, rgba(0,255,102,0.25) 0%, rgba(0,80,30,0.5) 100%);
+            border-color: var(--neon-green);
+            color: var(--neon-green);
+            box-shadow: 0 0 25px rgba(0, 255, 102, 0.6);
+        }
+
+        .btn-launch-execute {
+            background: rgba(255, 170, 0, 0.2);
+            border: 2px solid rgba(255, 170, 0, 0.4);
+            color: rgba(255, 255, 255, 0.4);
+            padding: 14px 30px;
+            border-radius: 40px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            font-size: 1.1rem;
+            cursor: not-allowed;
+            transition: all 0.4s;
+            box-shadow: none;
+            text-align: center;
+            width: 100%;
+            letter-spacing: 2px;
+        }
+
+        .btn-launch-execute.ready {
+            background: linear-gradient(180deg, var(--neon-gold) 0%, #cc8400 100%);
+            border-color: #fff;
+            color: #000;
+            cursor: pointer;
+            box-shadow: 0 0 35px var(--neon-gold);
+            animation: launch-pulse 1s infinite alternate;
+        }
+
+        @keyframes launch-pulse {
+            from { box-shadow: 0 0 15px var(--neon-gold); transform: scale(1); }
+            to { box-shadow: 0 0 40px var(--neon-gold); transform: scale(1.02); }
+        }
+
+        .cockpit-info-screen {
+            background: rgba(3, 8, 18, 0.95);
+            border: 2px solid var(--neon-blue);
+            box-shadow: 0 0 25px rgba(0, 243, 255, 0.25);
+            padding: 20px 25px;
+            border-radius: 14px;
+            color: #fff;
+            font-size: 1.15rem;
+            font-weight: 700;
+            line-height: 1.7;
+            text-align: center;
+            max-width: 750px;
+            margin: 0 auto;
+            backdrop-filter: blur(8px);
+            font-family: 'Tajawal', sans-serif;
+            transition: all 0.4s ease;
+        }
+
+        .quiz-card {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-glow);
+            box-shadow: 0 0 30px rgba(0, 243, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            width: 90%;
+            max-width: 750px;
+            padding: 25px;
+            text-align: center;
+            position: relative;
+        }
+
+        .quiz-card h3 {
+            color: var(--neon-blue);
+            margin-bottom: 15px;
+            font-size: clamp(1rem, 2.5vw, 1.3rem);
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        @media (max-width: 600px) {
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .option-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 12px;
+            border-radius: 8px;
+            color: #fff;
+            font-size: clamp(0.9rem, 2vw, 1.05rem);
+            font-family: 'Tajawal', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: right;
+        }
+
+        .option-btn:hover {
+            background: rgba(0, 243, 255, 0.15);
+            border-color: var(--neon-blue);
+            transform: translateY(-2px);
+        }
+
+        .option-btn.selected-correct {
+            background: rgba(0, 255, 102, 0.2) !important;
+            border-color: var(--neon-green) !important;
+            color: var(--neon-green) !important;
+        }
+
+        /* صندوق المعلومات التعليمي الجديد للإجابات الصحيحة في الأسئلة */
+        .question-info-panel {
+            margin-top: 15px;
+            padding: 15px 20px;
+            background: rgba(0, 255, 102, 0.12);
+            border: 2px solid var(--neon-green);
+            box-shadow: 0 0 20px rgba(0, 255, 102, 0.3);
+            border-radius: 10px;
+            color: #fff;
+            font-size: 1rem;
+            line-height: 1.6;
+            text-align: right;
+            animation: fadeInInfo 0.4s ease-out;
+        }
+
+        @keyframes fadeInInfo {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .combustion-anim {
+            display: none;
+            margin-top: 15px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(0.9rem, 2vw, 1.1rem);
+            color: var(--neon-gold);
+            letter-spacing: 2px;
+        }
+
+        .transmission-box {
+            background: rgba(0, 0, 0, 0.88);
+            border: 1px solid var(--neon-green);
+            box-shadow: 0 0 25px rgba(0, 255, 102, 0.2);
+            padding: 25px;
+            border-radius: 8px;
+            max-width: 750px;
+            width: 90%;
+            text-align: right;
+            line-height: 1.8;
+            font-size: clamp(1rem, 2.2vw, 1.2rem);
+            position: relative;
+        }
+
+        .radio-active-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.8rem;
+            color: var(--neon-green);
+            background: rgba(0, 255, 102, 0.1);
+            border: 1px solid var(--neon-green);
+            padding: 4px 10px;
+            border-radius: 12px;
+            animation: pulse-green 1s infinite alternate;
+        }
+
+        .trans-header {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-green);
+            margin-bottom: 12px;
+            font-size: clamp(0.9rem, 2vw, 1.1rem);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .choice-btns {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn-choice {
+            padding: 10px 25px;
+            border-radius: 30px;
+            border: none;
+            font-size: clamp(0.95rem, 2vw, 1.1rem);
+            font-weight: bold;
+            font-family: 'Tajawal', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-yes { background: var(--neon-green); color: #000; box-shadow: 0 0 15px rgba(0, 255, 102, 0.4); }
+        .btn-yes:hover { transform: scale(1.05); }
+
+        .btn-no { background: var(--neon-red); color: #fff; box-shadow: 0 0 15px rgba(255, 0, 85, 0.4); }
+        .btn-no:hover { transform: scale(1.05); }
+
+        .btn-replay-story {
+            background: rgba(0, 243, 255, 0.1);
+            border: 1px solid var(--neon-blue);
+            color: var(--neon-blue);
+            padding: 8px 18px;
+            border-radius: 30px;
+            font-size: 0.95rem;
+            font-family: 'Tajawal', sans-serif;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-replay-story:hover {
+            background: var(--neon-blue);
+            color: #000;
+            box-shadow: 0 0 15px var(--neon-blue);
+            transform: scale(1.04);
+        }
+
+        .btn-finish-mission {
+            background: rgba(0, 255, 102, 0.2);
+            border: 2px solid var(--neon-green);
+            color: var(--neon-green);
+            padding: 8px 24px;
+            border-radius: 30px;
+            font-size: 0.95rem;
+            font-family: 'Tajawal', sans-serif;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-finish-mission:hover {
+            background: var(--neon-green);
+            color: #000;
+            box-shadow: 0 0 25px var(--neon-green);
+            transform: scale(1.06);
+        }
+
+        .btn-action {
+            background: transparent;
+            border: 2px solid var(--neon-blue);
+            color: var(--neon-blue);
+            padding: 10px 30px;
+            font-size: 1.1rem;
+            font-family: 'Orbitron', 'Tajawal', sans-serif;
+            cursor: pointer;
+            border-radius: 5px;
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.3);
+            transition: all 0.3s;
+        }
+
+        .btn-action:hover {
+            background: var(--neon-blue);
+            color: #000;
+            box-shadow: 0 0 30px var(--neon-blue);
+        }
+
+        .btn-check-sys {
+            background: rgba(0, 255, 102, 0.15);
+            border: 2px solid var(--neon-green);
+            color: var(--neon-green);
+            padding: 12px 35px;
+            font-size: 1.2rem;
+            font-family: 'Tajawal', 'Orbitron', sans-serif;
+            font-weight: bold;
+            border-radius: 40px;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(0, 255, 102, 0.4);
+            transition: all 0.3s ease;
+            animation: pulse-green 1.5s infinite alternate;
+        }
+
+        .btn-check-sys:hover {
+            background: var(--neon-green);
+            color: #000;
+            box-shadow: 0 0 40px var(--neon-green);
+            transform: scale(1.08);
+        }
+
+        @keyframes pulse-green {
+            from { box-shadow: 0 0 10px rgba(0, 255, 102, 0.3); }
+            to { box-shadow: 0 0 30px rgba(0, 255, 102, 0.8); }
+        }
+
+        .final-controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn-restart {
+            background: rgba(0, 255, 102, 0.2);
+            border: 2px solid var(--neon-green);
+            color: var(--neon-green);
+            padding: 10px 25px;
+            font-size: 1.1rem;
+            font-family: 'Tajawal', sans-serif;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 30px;
+            box-shadow: 0 0 15px rgba(0, 255, 102, 0.3);
+            transition: all 0.3s;
+        }
+
+        .btn-restart:hover {
+            background: var(--neon-green);
+            color: #000;
+            box-shadow: 0 0 30px var(--neon-green);
+            transform: scale(1.05);
+        }
+
+        .btn-exit {
+            background: rgba(255, 0, 85, 0.2);
+            border: 2px solid var(--neon-red);
+            color: var(--neon-red);
+            padding: 10px 25px;
+            font-size: 1.1rem;
+            font-family: 'Tajawal', sans-serif;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 30px;
+            box-shadow: 0 0 15px rgba(255, 0, 85, 0.3);
+            transition: all 0.3s;
+        }
+
+        .btn-exit:hover {
+            background: var(--neon-red);
+            color: #fff;
+            box-shadow: 0 0 30px var(--neon-red);
+            transform: scale(1.05);
+        }
+
+        .hidden { display: none !important; }
+        .text-neon { color: var(--neon-blue); font-family: 'Orbitron', sans-serif; }
+    </style>
+</head>
+<body>
+
+<audio id="story-audio-player" src="story_audio.mp3" preload="auto"></audio>
+
+<div id="viewport">
+
+    <div id="start-overlay">
+        <h1 style="color: var(--neon-blue); font-family: 'Orbitron'; font-size: clamp(1.5rem, 3.5vw, 2.2rem);">MISSION SYSTEM INTERFACE</h1>
+        <p style="font-size: clamp(1rem, 2vw, 1.2rem); color: #ccc;">اضغط على الزر أدناه لبدء المحاكاة بالصاروخ المطور</p>
+        <button class="btn-start-exp" onclick="startSystemWithAudio()">بدء التجربة الفضائية 🚀</button>
+    </div>
+
+    <div class="global-controls">
+        <div class="slide-indicator" id="slide-indicator">ATMOSPHERE ASCENT</div>
+        <div style="display: flex; gap: 10px; align-items: center;">
+            <button class="btn-audio-toggle" id="audio-toggle-btn" onclick="toggleAudioMute()">🔊 الصوت: مفعل</button>
+            <button class="btn-next-step" id="global-next-btn" onclick="nextStepManual()">
+                متابعة الرحلة 🚀
+            </button>
+        </div>
+    </div>
+
+    <!-- SLIDE 0 -->
+    <section id="slide-0" class="slide active" style="padding: 0; width: 100%; height: 100%;">
+        <canvas id="earth-simulation-canvas"></canvas>
+        
+        <div class="hud-overlay">
+            <div class="hud-box">
+                <h4>🚀 ROCKET TELEMETRY</h4>
+                <div>TARGET: ORBIT</div>
+                <div>CURRENT LAYER: <span id="hud-current-layer" style="color:var(--neon-green); font-weight:bold;">TROPOSPHERE</span></div>
+                <div>ALTITUDE: <span id="hud-altitude" style="color:var(--neon-gold)">12</span> KM</div>
+                <div>PROPULSION: <span style="color:var(--neon-green)">100% NOMINAL</span></div>
+            </div>
+
+            <div class="hud-box" style="text-align: right; direction: rtl;">
+                <h4>🌐 طبقات الغلاف الجوي</h4>
+                <div id="layer-txt-5" style="opacity: 0.5;">5. الإكسوسفير (Exosphere)</div>
+                <div id="layer-txt-4" style="opacity: 0.5;">4. الثرموسفير (Thermosphere)</div>
+                <div id="layer-txt-3" style="opacity: 0.5;">3. الميزوسفير (Mesosphere)</div>
+                <div id="layer-txt-2" style="opacity: 0.5;">2. الستراتوسفير (Stratosphere)</div>
+                <div id="layer-txt-1" style="color:var(--neon-blue); font-weight:bold;">1. التروبوسفير (Troposphere)</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SLIDE 1: شريحة التنبيه مع صوت الإنذار الكلاسيكي المريح للأذن -->
+    <section id="slide-1" class="slide">
+        <canvas id="canvas-slide1" class="space-bg"></canvas>
+        <div class="content-layer">
+            <div class="alert-box">
+                <h2 class="flash-text">🚨 SYSTEM ALERT 🚨</h2>
+                <p class="flash-subtext">ATMOSPHERE ERROR</p>
+                <p style="margin-top: 15px; color: #fff; font-size: clamp(1rem, 2vw, 1.2rem); font-weight: bold;">تم اكتشاف اضطراب خطير في طبقات الغلاف الجوي للمركبة!</p>
+                <p style="margin-top: 10px; color: var(--neon-gold); font-size: clamp(0.9rem, 1.8vw, 1rem);">اضغط على "متابعة الرحلة 🚀" لإصلاح الخلل وإعادة الترتيب</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- SLIDE 2 -->
+    <section id="slide-2" class="slide">
+        <canvas id="canvas-slide2" class="space-bg"></canvas>
+        <div class="content-layer">
+            <div class="atmosphere-challenge-wrapper">
+                <h3 style="margin-bottom: 5px; font-size: clamp(1rem, 2.2vw, 1.3rem); text-align: center;">🧪 التحدي: اسحب ورتّب طبقات الغلاف الجوي من سطح الأرض إلى الفضاء</h3>
+                
+                <div class="drop-zones" id="drop-zones">
+                    <div class="drop-slot" data-index="0">1.<br>القريبة للأرض</div>
+                    <div class="drop-slot" data-index="1">2.<br>الطبقة الثانية</div>
+                    <div class="drop-slot" data-index="2">3.<br>الطبقة الثالثة</div>
+                    <div class="drop-slot" data-index="3">4.<br>الطبقة الرابعة</div>
+                    <div class="drop-slot" data-index="4">5.<br>الأبعد (الفضاء)</div>
+                </div>
+
+                <div class="drag-container" id="drag-container">
+                    <div class="draggable-item" id="layer-exosphere">الإكسوسفير</div>
+                    <div class="draggable-item" id="layer-troposphere">التروبوسفير</div>
+                    <div class="draggable-item" id="layer-thermosphere">الثرموسفير</div>
+                    <div class="draggable-item" id="layer-mesosphere">الميزوسفير</div>
+                    <div class="draggable-item" id="layer-stratosphere">الستراتوسفير</div>
+                </div>
+
+                <div style="margin-top: 10px;">
+                    <button class="btn-action" onclick="checkAtmosphereOrder()">التحقق من الترتيب 🧪</button>
+                </div>
+                <div id="slide2-status" style="margin-top: 8px; font-weight: bold; height: 25px; font-size: 0.95rem;"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SLIDE 3 -->
+    <section id="slide-3" class="slide">
+        <canvas id="canvas-slide3" class="space-bg"></canvas>
+        <div class="content-layer">
+            <div class="alert-box" id="chem-alert-screen">
+                <h2 class="flash-text">🚨 SYSTEM ALERT 🚨</h2>
+                <p class="flash-subtext">CHEMISTRY SYSTEM MALFUNCTION</p>
+                <p style="margin-top: 15px; color: var(--neon-gold); font-size: 1.2rem; font-weight: bold;">
+                    <span class="en-text">6 PROBLEMS DETECTED</span>
+                </p>
+                <p style="margin-top: 10px; color: #fff; font-size: 1rem; font-family: 'Orbitron';" class="en-text">SOLVE ALL PROBLEMS TO CONTINUE</p>
+                <p style="margin-top: 15px; color: var(--neon-blue); font-size: 0.9rem;">اضغط على "متابعة الرحلة 🚀" للبدء وحل المشكلات</p>
+            </div>
+
+            <div class="quiz-card hidden" id="quiz-card-box">
+                <div style="font-family: 'Orbitron'; color: var(--neon-red); font-size: 0.85rem; margin-bottom: 5px;">
+                    ⚠️ CHEMISTRY SYSTEM MALFUNCTION — <span id="solved-count">0</span>/6 SOLVED
+                </div>
+                
+                <h3 id="quiz-question">جاري تحميل السؤال...</h3>
+
+                <div class="options-grid" id="options-container"></div>
+
+                <!-- صندوق معلومات الإجابة الصحيحة -->
+                <div id="question-info-panel" class="question-info-panel hidden"></div>
+
+                <div id="combustion-box" class="combustion-anim">
+                    🔥 FUEL + OXIDIZER → COMBUSTION → HOT GASES → THRUST
+                </div>
+
+                <div id="quiz-feedback" style="margin-top: 12px; font-weight: bold; min-height: 25px; font-size: 0.95rem;"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SLIDE 4: قمرة القيادة والعد التنازلي المؤمن -->
+    <section id="slide-4" class="slide">
+        <canvas id="canvas-slide4" class="space-bg"></canvas>
+        
+        <div class="cockpit-dashboard" id="cockpit-dashboard-ui">
+            <div class="cockpit-header-hud">
+                <span style="font-family:'Orbitron'; color:var(--neon-green); font-size:0.9rem;">⚡ COMMAND: SECURE</span>
+                <span style="font-family:'Orbitron'; color:var(--neon-gold); font-size:0.9rem;">MODULE: ORBIT-X</span>
+            </div>
+            
+            <div style="text-align: center; margin: 5px 0;">
+                <h2 style="font-family: 'Orbitron'; color: var(--neon-blue); font-size: clamp(1.3rem, 2.8vw, 1.7rem); letter-spacing: 2px; margin-bottom: 5px;">غرفة تحكم إطلاق الصاروخ</h2>
+                <p style="font-size: clamp(0.85rem, 1.6vw, 1rem); color: #cbd5e1;">اضغط على أزرار الأنظمة لاستعراض دورها الفني، ثم اضغط زر الانطلاق بعد تفعيلها جميعاً</p>
+            </div>
+
+            <div class="cockpit-panel-container">
+                <div class="cockpit-info-screen" id="cockpit-info-box">
+                    📡 لوحة التحكم جاهزة. اضغط على أي زر تفاعلي لاستكشاف دوره في الإقلاع الكيميائي والفلكي.
+                </div>
+
+                <div class="cockpit-panel">
+                    <button class="cockpit-btn" id="cp-btn-1" onclick="toggleCockpitSystem(1)">⚙️ 1. تفعيل المؤكسد</button>
+                    <button class="cockpit-btn" id="cp-btn-2" onclick="toggleCockpitSystem(2)">⛽ 2. ضغط الوقود</button>
+                    <button class="cockpit-btn" id="cp-btn-3" onclick="toggleCockpitSystem(3)">🛰️ 3. توجيه الجيروسكوب</button>
+                </div>
+
+                <button class="btn-launch-execute" id="launch-execute-btn" onclick="executeLaunchSequence()" disabled>
+                    🚀 إطلاق الصاروخ نحو الفضاء (بانتظار تفعيل الأنظمة)
+                </button>
+            </div>
+        </div>
+
+        <div class="content-layer">
+            <div id="launch-phase" class="hidden" style="text-align: center; z-index: 28;">
+                <h1 class="text-neon" style="font-size: clamp(2rem, 4vw, 2.8rem); margin-bottom: 15px;">LAUNCH SEQUENCE INITIATED</h1>
+                <div id="countdown-display" style="font-family: 'Orbitron'; font-size: clamp(4rem, 8vw, 6rem); color: var(--neon-gold); font-weight: 900;">3</div>
+            </div>
+
+            <div id="transmission-phase" class="hidden" style="z-index: 30;">
+                <div class="transmission-box">
+                    <div class="trans-header">
+                        <span>📡 INCOMING RADIO TRANSMISSION</span>
+                        <div class="radio-active-badge">
+                            <span style="display:inline-block; width:8px; height:8px; background:var(--neon-green); border-radius:50%;"></span>
+                            VOICE COMMS ONLINE
+                        </div>
+                        <span style="color: var(--neon-gold);">YEAR: 1957</span>
+                    </div>
+                    
+                    <div id="trans-text-1">
+                        عَامَ 1957ميلادي ، فُتِحَ بَابٌ لَمْ يُغْلَقْ بَعْدُ…
+                        <br>
+                        أَطْلَقَ الاِتِّحَادُ السُّوفْيِيتِيُّ Sputnik 1، أَوَّلَ قَمَرٍ صِنَاعِيٍّ يَدُورُ حَوْلَ الأَرْضِ، فَبَدَأَ عَصْرٌ جَدِيدٌ: عَصْرُ غَزْوِ الفَضَاءِ.
+                        <br>
+                        وَلَمْ تَمْضِ أَسَابِيعُ، حَتَّى حَمَلَ Sputnik 2 الكَلْبَةَ Laika إِلَى الفَضَاءِ… لِتُصْبِحَ الرِّحْلَةُ أَبْعَدَ مِنَ الأَرْضِ، وَأَقْرَبَ إِلَى المَجْهُولِ.
+                    </div>
+
+                    <div style="text-align: center; margin-top: 15px;">
+                        <button class="btn-replay-story" onclick="playStoryPart1Audio()">🔄 إعادة استماع القصة</button>
+                    </div>
+                    
+                    <div id="trans-choice" style="margin-top: 15px; text-align: center;">
+                        <p style="margin-bottom: 12px; font-weight: bold;">هل ترغب في متابعة القصة؟</p>
+                        <div class="choice-btns">
+                            <button class="btn-choice btn-yes" onclick="chooseStory(true)">🟢 نعم، أريد معرفة ما حدث.</button>
+                            <button class="btn-choice btn-no" onclick="chooseStory(false)">🔴 لا، أريد إنهاء المهمة.</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- SLIDE 5 -->
+    <section id="slide-5" class="slide">
+        <canvas id="canvas-slide5" class="space-bg"></canvas>
+        <div class="content-layer">
+            
+            <div id="story-expansion" class="transmission-box hidden" style="margin-bottom: 15px; z-index: 30;">
+                <div class="trans-header">
+                    <span>📡 RADIO TRANSMISSION CONTINUED</span>
+                    <span style="color: var(--neon-gold);">YEAR: 1961</span>
+                </div>
+                
+                <p id="trans-text-2">
+                    لَكِنَّ Sputnik لَمْ يَكُنْ سِوَى البِدَايَةِ…
+                    <br>
+                    وَاصَلَ الإِنْسَانُ مُحَاوَلَاتِهِ لِلْوُصُولِ إِلَى الفَضَاءِ، حَتَّى جَاءَ اليَوْمُ الَّذِي تَغَيَّرَ فِيهِ كُلُّ شَيْءٍ.
+                    <br>
+                    فِي عَامِ 1961م، اِنْطَلَقَ Yuri Gagarin عَلَى مَتْنِ Vostok 1.
+                    <br>
+                    وَفِي تِلْكَ الرِّحْلَةِ، أَصْبَحَ أَوَّلَ إِنْسَانٍ يَصِلُ إِلَى الفَضَاءِ، وَأَوَّلَ إِنْسَانٍ يَدُورُ حَوْلَ الأَرْضِ.
+                    <br>
+                    وَمُنْذُ تِلْكَ اللَّحْظَةِ… لَمْ يَعُدِ الفَضَاءُ حُلْمًا يُنْظَرُ إِلَيْهِ مِنَ الأَرْضِ، بَلْ طَرِيقًا يَسْتَطِيعُ الإِنْسَانُ أَنْ يَسْلُكَهُ.
+                </p>
+
+                <div style="display: flex; gap: 12px; justify-content: center; margin-top: 15px; flex-wrap: wrap;">
+                    <button class="btn-replay-story" onclick="playStoryPart2Audio()">🔄 إعادة استماع القصة</button>
+                    <button class="btn-finish-mission" onclick="showFinalScreen('تمت المحاكاة وتجاوز كافة الاختبارات بنجاح!')">إكمال المهمة والختام 🏁</button>
+                </div>
+            </div>
+
+            <div id="destination-box" class="text-neon" style="font-size: 2rem; letter-spacing: 4px; display: none;">
+                DESTINATION: MOON 🌕
+            </div>
+
+            <div id="final-screen" class="hidden" style="text-align: center; z-index: 101; max-width: 800px; padding: 20px;">
+                <h1 style="color: var(--neon-green); font-size: clamp(2.2rem, 5vw, 3rem); margin-bottom: 5px; font-family: 'Orbitron';" id="final-title">🚀 MISSION COMPLETE</h1>
+                <h2 style="font-size: clamp(1.3rem, 2.5vw, 1.8rem); color: #fff; margin-bottom: 10px;">سجل إنجازات رائد الفضاء</h2>
+                
+                <div class="badges-container">
+                    <div class="mission-badge">🌐 وسام مهندس الغلاف الجوي</div>
+                    <div class="mission-badge">🧪 وسام خبير الكيمياء</div>
+                    <div class="mission-badge">👨‍🚀 وسام رحلة الفضاء التاريخية</div>
+                </div>
+
+                <p style="color: var(--neon-blue); font-size: clamp(0.95rem, 2vw, 1.1rem); margin-bottom: 20px;" id="final-desc">تهانينا! تمت المحاكاة بنجاح وتجاوز كافة الاختبارات بنجاح!</p>
+
+                <div class="final-controls">
+                    <button class="btn-restart" onclick="restartEntireProject()">إعادة المحاكاة 🔄</button>
+                    <button class="btn-exit" onclick="exitProject()">إغلاق المشروع ❌</button>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+</div>
+
+<script>
+    let currentSlide = 0;
+    let isSlide2Passed = false;
+    let isSlide3AlertActive = true;
+    let isCurrentQSolved = false;
+    let userStoryChoice = false;
+    let isFinalScreenReached = false;
+    let isSystemCheckPhase = false;
+    let isAudioMuted = false;
+    let rocketProgress = 0; 
+    let sirenInterval = null;
+    let radioStaticNoiseNode = null;
+    let radioGainNode = null;
+
+    let ambientSpaceNoiseNode = null;
+    let ambientSpaceGainNode = null;
+
+    let cockpitSystems = { 1: false, 2: false, 3: false };
+
+    const cockpitData = {
+        1: {
+            text: "⚙️ [تفعيل المؤكسد]: في الفضاء الخارجي لا يوجد هواء، لذلك يحمل الصاروخ مؤكسداً كيميائياً (مثل الأكسجين السائل) ليمتزج مع الوقود ويسمح بحدوث عملية الاحتراق الهائل وتوليد الدفع.",
+            borderColor: "#ff0055",
+            bgColor: "rgba(255, 0, 85, 0.15)",
+            glowColor: "0 0 30px rgba(255, 0, 85, 0.5)"
+        },
+        2: {
+            text: "⛽ [ضغط الوقود]: نظام تحكم هيدروليكي وإلكتروني يدفع الوقود السائل إلى غرفة الاحتراق تحت ضغط شديد ومدروس بدقة لضمان استمرار قوة الاندفاع نحو الفضاء.",
+            borderColor: "#ffaa00",
+            bgColor: "rgba(255, 170, 0, 0.15)",
+            glowColor: "0 0 30px rgba(255, 170, 0, 0.5)"
+        },
+        3: {
+            text: "🛰️ [توجيه الجيروسكوب]: نظام ملاحة ذكي يعتمد على العزم الدوراني للحفاظ على توازن واستقامة الصاروخ طوال رحلة اختراقه لطبقات الغلاف الجوي وتجنب انحرافه.",
+            borderColor: "#00ff66",
+            bgColor: "rgba(0, 255, 102, 0.15)",
+            glowColor: "0 0 30px rgba(0, 255, 102, 0.5)"
+        }
+    };
+
+    const storyAudio = document.getElementById('story-audio-player');
+    const PART1_END_TIME = 25.20; 
+    let audioTimeUpdateHandler = null;
+
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    let audioCtx = null;
+
+    function initAudio() {
+        if (!audioCtx) audioCtx = new AudioContext();
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+    }
+
+    function toggleAudioMute() {
+        isAudioMuted = !isAudioMuted;
+        const btn = document.getElementById('audio-toggle-btn');
+        if (isAudioMuted) {
+            btn.innerText = "🔇 الصوت: كتم";
+            if (audioCtx) audioCtx.suspend();
+            if (storyAudio) storyAudio.muted = true;
+        } else {
+            btn.innerText = "🔊 الصوت: مفعل";
+            if (audioCtx) audioCtx.resume();
+            if (storyAudio) storyAudio.muted = false;
+        }
+    }
+
+    function startAmbientSpaceSound() {
+        if (isAudioMuted) return;
+        initAudio();
+        if (audioCtx.state !== 'running') return;
+        stopAmbientSpaceSound();
+
+        const now = audioCtx.currentTime;
+        const bufferSize = audioCtx.sampleRate * 2;
+        const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+            data[i] = Math.random() * 2 - 1;
+        }
+
+        ambientSpaceNoiseNode = audioCtx.createBufferSource();
+        ambientSpaceNoiseNode.buffer = buffer;
+        ambientSpaceNoiseNode.loop = true;
+
+        const filter = audioCtx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(160, now);
+
+        ambientSpaceGainNode = audioCtx.createGain();
+        ambientSpaceGainNode.gain.setValueAtTime(0.01, now);
+        ambientSpaceGainNode.gain.exponentialRampToValueAtTime(0.35, now + 1.5);
+
+        ambientSpaceNoiseNode.connect(filter);
+        filter.connect(ambientSpaceGainNode);
+        ambientSpaceGainNode.connect(audioCtx.destination);
+
+        ambientSpaceNoiseNode.start();
+    }
+
+    function stopAmbientSpaceSound() {
+        if (ambientSpaceGainNode && audioCtx) {
+            const now = audioCtx.currentTime;
+            try {
+                ambientSpaceGainNode.gain.setValueAtTime(ambientSpaceGainNode.gain.value, now);
+                ambientSpaceGainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+                setTimeout(() => {
+                    if (ambientSpaceNoiseNode) {
+                        ambientSpaceNoiseNode.stop();
+                        ambientSpaceNoiseNode.disconnect();
+                        ambientSpaceNoiseNode = null;
+                    }
+                }, 500);
+            } catch (e) {}
+        }
+    }
+
+    function startSystemWithAudio() {
+        initAudio();
+        document.getElementById('start-overlay').style.display = 'none';
+        startAmbientSpaceSound();
+    }
+
+    function playBeep(freq = 440, type = 'sine', duration = 0.1) {
+        if (isAudioMuted) return;
+        initAudio();
+        if (audioCtx.state !== 'running') return;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.value = freq;
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+        osc.stop(audioCtx.currentTime + duration);
+    }
+
+    function playRadioPTTBeep() {
+        if (isAudioMuted) return;
+        initAudio();
+        if (audioCtx.state !== 'running') return;
+        const now = audioCtx.currentTime;
+
+        const osc1 = audioCtx.createOscillator();
+        const osc2 = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        osc1.type = 'sine';
+        osc2.type = 'triangle';
+        osc1.frequency.setValueAtTime(1240, now);
+        osc1.frequency.setValueAtTime(880, now + 0.05);
+        osc2.frequency.setValueAtTime(600, now);
+
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.linearRampToValueAtTime(0.01, now + 0.1);
+
+        osc1.connect(gain);
+        osc2.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc1.start(now);
+        osc2.start(now);
+        osc1.stop(now + 0.1);
+        osc2.stop(now + 0.1);
+    }
+
+    function startRadioStatic() {
+        if (isAudioMuted) return;
+        initAudio();
+        if (audioCtx.state !== 'running') return;
+        stopRadioStatic();
+
+        const bufferSize = audioCtx.sampleRate * 2;
+        const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+        const output = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+            output[i] = Math.random() * 2 - 1;
+        }
+
+        radioStaticNoiseNode = audioCtx.createBufferSource();
+        radioStaticNoiseNode.buffer = buffer;
+        radioStaticNoiseNode.loop = true;
+
+        const filter = audioCtx.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.value = 1500;
+        filter.Q.value = 3.0;
+
+        radioGainNode = audioCtx.createGain();
+        radioGainNode.gain.setValueAtTime(0.02, audioCtx.currentTime); 
+
+        radioStaticNoiseNode.connect(filter);
+        filter.connect(radioGainNode);
+        radioGainNode.connect(audioCtx.destination);
+
+        radioStaticNoiseNode.start();
+    }
+
+    function stopRadioStatic() {
+        if (radioStaticNoiseNode) {
+            try { radioStaticNoiseNode.stop(); } catch(e){}
+            radioStaticNoiseNode = null;
+        }
+    }
+
+    function playStoryPart1Audio() {
+        if (isAudioMuted) return;
+        if (!storyAudio) return;
+        stopStoryAudio();
+
+        playRadioPTTBeep();
+        setTimeout(() => startRadioStatic(), 100);
+
+        storyAudio.currentTime = 0;
+        storyAudio.play().catch(e => console.log(e));
+
+        audioTimeUpdateHandler = () => {
+            if (storyAudio.currentTime >= PART1_END_TIME) {
+                storyAudio.pause();
+                stopRadioStatic();
+                playRadioPTTBeep();
+                storyAudio.removeEventListener('timeupdate', audioTimeUpdateHandler);
+            }
+        };
+        storyAudio.addEventListener('timeupdate', audioTimeUpdateHandler);
+    }
+
+    function playStoryPart2Audio() {
+        if (isAudioMuted) return;
+        if (!storyAudio) return;
+        if (audioTimeUpdateHandler) {
+            storyAudio.removeEventListener('timeupdate', audioTimeUpdateHandler);
+        }
+
+        playRadioPTTBeep();
+        setTimeout(() => startRadioStatic(), 100);
+
+        storyAudio.currentTime = PART1_END_TIME;
+        storyAudio.play().catch(e => console.log(e));
+
+        storyAudio.onended = () => {
+            stopRadioStatic();
+            playRadioPTTBeep();
+        };
+    }
+
+    function stopStoryAudio() {
+        if (storyAudio) {
+            storyAudio.pause();
+            if (audioTimeUpdateHandler) {
+                storyAudio.removeEventListener('timeupdate', audioTimeUpdateHandler);
+            }
+            storyAudio.onended = null;
+        }
+        stopRadioStatic();
+    }
+
+    function speakDeepEnglishVoice(text) {
+        if (isAudioMuted) return;
+        initAudio();
+
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            const utter = new SpeechSynthesisUtterance(text);
+            utter.lang = 'en-US';
+            utter.pitch = 0.1; 
+            utter.rate = 0.85;  
+            utter.volume = 1.0;
+
+            const voices = window.speechSynthesis.getVoices();
+            const deepVoice = voices.find(v => v.lang.includes('en') && (v.name.includes('Male') || v.name.includes('David') || v.name.includes('Google US English') || v.name.includes('Natural')));
+            if (deepVoice) utter.voice = deepVoice;
+
+            window.speechSynthesis.speak(utter);
+        }
+    }
+
+    function playSirenSound() {
+        if (isAudioMuted) return;
+        initAudio();
+        if (audioCtx.state !== 'running') return;
+        playBeep(880, 'sawtooth', 0.15);
+        setTimeout(() => playBeep(660, 'sawtooth', 0.15), 150);
+    }
+
+    function startLoopingSiren() {
+        stopSiren();
+        playSirenSound();
+        sirenInterval = setInterval(() => {
+            if (currentSlide === 1 || (currentSlide === 3 && isSlide3AlertActive)) {
+                playSirenSound();
+            } else {
+                stopSiren();
+            }
+        }, 800);
+    }
+
+    function stopSiren() {
+        if (sirenInterval) {
+            clearInterval(sirenInterval);
+            sirenInterval = null;
+        }
+    }
+
+    function playSuccessSound() {
+        if (isAudioMuted) return;
+        initAudio();
+        playBeep(523.25, 'triangle', 0.15);
+        setTimeout(() => playBeep(659.25, 'triangle', 0.15), 120);
+        setTimeout(() => playBeep(783.99, 'triangle', 0.3), 240);
+    }
+
+    function playErrorSound() {
+        if (isAudioMuted) return;
+        initAudio();
+        playBeep(180, 'sawtooth', 0.2);
+        setTimeout(() => playBeep(130, 'sawtooth', 0.3), 150);
+    }
+
+    function playRumbleSound(duration = 2) {
+        if (isAudioMuted) return;
+        initAudio();
+        if (audioCtx.state !== 'running') return;
+        const bufferSize = audioCtx.sampleRate * duration;
+        const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+            data[i] = Math.random() * 2 - 1;
+        }
+
+        const noise = audioCtx.createBufferSource();
+        noise.buffer = buffer;
+
+        const filter = audioCtx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.value = 120;
+
+        const gain = audioCtx.createGain();
+        gain.gain.setValueAtTime(0.8, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+
+        noise.connect(filter);
+        filter.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        noise.start();
+    }
+
+    function toggleCockpitSystem(sysId) {
+        playBeep(880, 'sine', 0.08);
+        cockpitSystems[sysId] = !cockpitSystems[sysId];
+        const btn = document.getElementById(`cp-btn-${sysId}`);
+        const infoBox = document.getElementById('cockpit-info-box');
+
+        if (infoBox) {
+            const data = cockpitData[sysId];
+            infoBox.innerText = data.text;
+            infoBox.style.borderColor = data.borderColor;
+            infoBox.style.backgroundColor = data.bgColor;
+            infoBox.style.boxShadow = data.glowColor;
+            infoBox.style.color = "#ffffff";
+        }
+
+        if (cockpitSystems[sysId]) {
+            btn.classList.add('active');
+            btn.innerText = btn.innerText.replace('تفعيل', 'تم التفعيل ✅');
+        } else {
+            btn.classList.remove('active');
+            btn.innerText = btn.innerText.replace('تم التفعيل ✅', 'تفعيل');
+        }
+
+        const launchBtn = document.getElementById('launch-execute-btn');
+        if (cockpitSystems[1] && cockpitSystems[2] && cockpitSystems[3]) {
+            launchBtn.classList.add('ready');
+            launchBtn.removeAttribute('disabled');
+            launchBtn.innerText = "🚀 إطلاق الصاروخ نحو الفضاء (الأنظمة جاهزة)";
+        } else {
+            launchBtn.classList.remove('ready');
+            launchBtn.setAttribute('disabled', 'true');
+            launchBtn.innerText = "🚀 إطلاق الصاروخ نحو الفضاء (بانتظار تفعيل الأنظمة)";
+        }
+    }
+
+    function executeLaunchSequence() {
+        if (!(cockpitSystems[1] && cockpitSystems[2] && cockpitSystems[3])) return;
+        playBeep(1046.5, 'triangle', 0.2);
+        const infoBox = document.getElementById('cockpit-info-box');
+        if (infoBox) {
+            infoBox.innerText = "🚀 تم تأكيد فحص جميع الأنظمة بنجاح! جاري بدء تسلسل الإقلاع الفضائي...";
+            infoBox.style.borderColor = "#00ff66";
+            infoBox.style.backgroundColor = "rgba(0, 255, 102, 0.15)";
+            infoBox.style.boxShadow = "0 0 35px rgba(0, 255, 102, 0.6)";
+        }
+        setTimeout(() => {
+            document.getElementById('cockpit-dashboard-ui').classList.add('hidden');
+            startSlide4Countdown();
+        }, 1000);
+    }
+
+    function goToSlide(slideIndex) {
+        if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+        stopStoryAudio();
+
+        if (slideIndex !== 0) {
+            stopAmbientSpaceSound();
+        }
+
+        currentSlide = slideIndex;
+        
+        if (currentSlide === 0) {
+            rocketProgress = 0; 
+            document.getElementById('slide-indicator').innerText = `ATMOSPHERE ASCENT`;
+            document.getElementById('global-next-btn').style.display = 'flex';
+            document.getElementById('global-next-btn').innerText = "متابعة الرحلة 🚀";
+            startAmbientSpaceSound();
+        } else if (currentSlide === 1) {
+            document.getElementById('slide-indicator').innerText = `ALERT / INITIATION`;
+            document.getElementById('global-next-btn').style.display = 'flex';
+            document.getElementById('global-next-btn').innerText = "متابعة الرحلة 🚀";
+            startLoopingSiren();
+        } else if (currentSlide === 3) {
+            if (isSlide3AlertActive) {
+                document.getElementById('slide-indicator').innerText = `CHEMISTRY ALERT`;
+                document.getElementById('global-next-btn').style.display = 'flex';
+                document.getElementById('global-next-btn').innerText = "متابعة الرحلة 🚀";
+                startLoopingSiren();
+            } else if (isSystemCheckPhase) {
+                document.getElementById('global-next-btn').style.display = 'none';
+            } else {
+                document.getElementById('global-next-btn').style.display = 'flex';
+                document.getElementById('global-next-btn').innerText = "متابعة الرحلة 🚀";
+            }
+        } else if (currentSlide === 4) {
+            document.getElementById('global-next-btn').style.display = 'none';
+        } else if (currentSlide === 5) {
+            document.getElementById('global-next-btn').style.display = 'none';
+        } else {
+            stopSiren();
+            document.getElementById('slide-indicator').innerText = `SLIDE 0${currentSlide - 1} / 04`;
+            document.getElementById('global-next-btn').style.display = 'flex';
+            document.getElementById('global-next-btn').innerText = "متابعة الرحلة 🚀";
+        }
+
+        document.querySelectorAll('.slide').forEach((s, idx) => {
+            if (idx === slideIndex) {
+                s.classList.add('active');
+            } else {
+                s.classList.remove('active');
+            }
+        });
+
+        if (isFinalScreenReached) {
+            document.getElementById('global-next-btn').style.display = 'none';
+        }
+
+        if (slideIndex === 3 && !isSlide3AlertActive && !isSystemCheckPhase) startSlide3();
+        if (slideIndex === 4) prepareSlide4Cockpit();
+        if (slideIndex === 5) startSlide5();
+    }
+
+    function nextStepManual() {
+        initAudio();
+        playBeep(700, 'sine', 0.08);
+
+        if (currentSlide === 0) {
+            stopAmbientSpaceSound();
+            goToSlide(1);
+            return;
+        }
+
+        if (currentSlide === 1) {
+            stopSiren();
+            goToSlide(2);
+            return;
+        }
+
+        if (currentSlide === 2) {
+            if (isSlide2Passed) {
+                goToSlide(3);
+            } else {
+                playErrorSound();
+                const statusDiv = document.getElementById('slide2-status');
+                statusDiv.style.color = "var(--neon-red)";
+                statusDiv.innerText = "⚠️ يجب ترتيب طبقات الغلاف الجوي بشكل صحيح والتحقق منها قبل متابعة الرحلة!";
+                
+                const viewport = document.getElementById('viewport');
+                viewport.classList.add('shake');
+                setTimeout(() => viewport.classList.remove('shake'), 400);
+            }
+            return;
+        }
+
+        if (currentSlide === 3) {
+            if (isSlide3AlertActive) {
+                isSlide3AlertActive = false;
+                stopSiren();
+                document.getElementById('chem-alert-screen').classList.add('hidden');
+                document.getElementById('quiz-card-box').classList.remove('hidden');
+                document.getElementById('slide-indicator').innerText = `SLIDE 02 / 04`;
+                startSlide3();
+                return;
+            }
+
+            if (currentQIdx < questions.length) {
+                if (isCurrentQSolved) {
+                    currentQIdx++;
+                    if (currentQIdx < questions.length) {
+                        loadQuestion();
+                    } else {
+                        isSystemCheckPhase = true;
+                        document.getElementById('global-next-btn').style.display = 'none';
+
+                        speakDeepEnglishVoice("All problems solved. System check required.");
+
+                        document.getElementById('quiz-card-box').innerHTML = `
+                            <h2 class="flash-green-text" style="font-size: 2.2rem; margin-bottom: 10px;">SOLVED 6/6 ✅</h2>
+                            <h3 class="flash-green-text" style="font-size: 1.5rem; letter-spacing: 2px;">CHEMISTRY SYSTEM RESTORED</h3>
+                            
+                            <div style="margin-top: 25px;">
+                                <button class="btn-check-sys" id="sys-action-btn" onclick="triggerSystemCheck()">🔍 فحص النظام</button>
+                            </div>
+
+                            <div id="system-status-msg" class="hidden" style="margin-top: 25px;">
+                                <p class="flash-green-text" style="font-size: 1.6rem; font-weight: bold; font-family: 'Orbitron'; letter-spacing: 2px;">
+                                    All chemistry systems are stable.
+                                </p>
+                                <div style="margin-top: 20px;">
+                                    <button class="btn-action" onclick="goToSlide(4)" style="border-color: var(--neon-green); color: var(--neon-green);">الانتقال للإقلاع 🚀</button>
+                                </div>
+                            </div>
+                        `;
+                    }
+                } else {
+                    playErrorSound();
+                    const feedback = document.getElementById('quiz-feedback');
+                    feedback.style.color = "var(--neon-red)";
+                    feedback.innerText = "⚠️ يرجى إجابة السؤال الحالي بشكل صحيح أولاً!";
+                }
+            } else {
+                goToSlide(4);
+            }
+            return;
+        }
+
+        if (currentSlide === 4) {
+            goToSlide(5);
+            return;
+        }
+
+        if (currentSlide === 5) {
+            showFinalScreen("تمت المحاكاة وتجاوز كافة الاختبارات بنجاح!");
+            return;
+        }
+    }
+
+    function triggerSystemCheck() {
+        speakDeepEnglishVoice("System check complete. All chemistry systems are stable.");
+
+        const btn = document.getElementById('sys-action-btn');
+        if (btn) {
+            btn.innerText = "🔍 إعادة فحص النظام";
+        }
+
+        const statusMsg = document.getElementById('system-status-msg');
+        if (statusMsg) {
+            statusMsg.classList.remove('hidden');
+        }
+    }
+
+    const correctAtmosphereOrder = [
+        'layer-troposphere',
+        'layer-stratosphere',
+        'layer-mesosphere',
+        'layer-thermosphere',
+        'layer-exosphere'
+    ];
+
+    let draggedItem = null;
+
+    function initStandardDragAndDrop() {
+        const items = document.querySelectorAll('.draggable-item');
+        const slots = document.querySelectorAll('.drop-slot');
+        const container = document.getElementById('drag-container');
+
+        items.forEach(item => {
+            item.setAttribute('draggable', 'true');
+
+            item.addEventListener('dragstart', (e) => {
+                draggedItem = item;
+                e.dataTransfer.setData('text/plain', item.id);
+            });
+
+            item.addEventListener('click', () => {
+                for (let slot of slots) {
+                    if (slot.children.length === 0) {
+                        slot.appendChild(item);
+                        break;
+                    }
+                }
+            });
+        });
+
+        slots.forEach(slot => {
+            slot.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                slot.classList.add('hovered');
+            });
+
+            slot.addEventListener('dragleave', () => {
+                slot.classList.remove('hovered');
+            });
+
+            slot.addEventListener('drop', (e) => {
+                e.preventDefault();
+                slot.classList.remove('hovered');
+                if (draggedItem) {
+                    if (slot.children.length > 0) {
+                        container.appendChild(slot.children[0]);
+                    }
+                    slot.appendChild(draggedItem);
+                }
+            });
+        });
+    }
+
+    function checkAtmosphereOrder() {
+        const slots = document.querySelectorAll('.drop-slot');
+        let currentOrder = [];
+        slots.forEach(slot => {
+            if (slot.children.length > 0) {
+                currentOrder.push(slot.children[0].id);
+            }
+        });
+
+        const statusDiv = document.getElementById('slide2-status');
+
+        if (currentOrder.length < 5) {
+            playErrorSound();
+            isSlide2Passed = false;
+            statusDiv.style.color = "var(--neon-red)";
+            statusDiv.innerText = "❌ يُرجى وضع كافة الطبقات في أماكنها أولاً";
+            return;
+        }
+
+        let isCorrect = currentOrder.every((val, idx) => val === correctAtmosphereOrder[idx]);
+
+        if (isCorrect) {
+            playSuccessSound();
+            isSlide2Passed = true;
+            statusDiv.style.color = "var(--neon-green)";
+            statusDiv.innerText = "✅ PATH CORRECTED — تم تصحيح المسار (اضغط 'متابعة الرحلة 🚀' للمتابعة)";
+        } else {
+            playErrorSound();
+            isSlide2Passed = false;
+            statusDiv.style.color = "var(--neon-red)";
+            statusDiv.innerText = "❌ INCORRECT ORDER — أعد المحاولة";
+        }
+    }
+
+    // الأسئلة مع إضافة حقل المعلومات التوضيحية (info) لكل إجابة صحيحة من 1 إلى 6
+    const questions = [
+        {
+            q: "عند إقلاع المركبة وابتعادها عن سطح الأرض، ماذا يحدث للوزن والكتلة؟ ولماذا؟",
+            options: [
+                "A) تتغير الكتلة ويتغير الوزن",
+                "B) لا تتغير الكتلة ويتغير الوزن بسبب تغير تأثير الجاذبية",
+                "C) تتغير الكتلة ولا يتغير الوزن",
+                "D) لا تتغير الكتلة ولا يتغير الوزن"
+            ],
+            correct: 1,
+            info: "💡 معلومة علمية: الكتلة هي مقدار ما يحتويه الجسم من مادة وهي ثابتة لا تتغير، بينما الوزن هو قوة جذب الأرض للجسم ويقل كلما ابتعدنا عن مركز الأرض بسبب تناقص الجاذبية."
+        },
+        {
+            q: "ما الذي تحتاجه عملية الاحتراق داخل محرك الصاروخ؟",
+            options: [
+                "A) الوقود فقط",
+                "B) الأكسجين فقط",
+                "C) الوقود والمؤكسد معًا",
+                "D) الماء والنيتروجين"
+            ],
+            correct: 2,
+            isCombustion: true,
+            info: "💡 معلومة علمية: نظراً لانعدام الهواء في الفضاء الخارجي، لا يستطيع الصاروخ الاعتماد على الأكسجين الجوي، لذا يحمل معه مادة مؤكسدة تمتزج بالوقود لإتمام الاحتراق وتوليد الدفع."
+        },
+        {
+            q: "ما سبب وجود ثقب في طبقة الأوزون؟",
+            options: [
+                "A) زيادة الأكسجين",
+                "B) مركبات الكلوروفلوروكربون CFCs",
+                "C) زيادة النيتروجين",
+                "D) انخفاض ضغط الهواء"
+            ],
+            correct: 1,
+            info: "💡 معلومة علمية: مركبات الكلوروفلوروكربون (CFCs) المستخدمة سابقاً في أجهزة التبريد تتصعد إلى طبقة الستراتوسفير وتتفاعل مع جزيئات الأوزون مدمرة إياها."
+        },
+        {
+            q: "أين توجد طبقة الأوزون؟",
+            options: [
+                "A) التروبوسفير",
+                "B) الستراتوسفير",
+                "C) الميزوسفير",
+                "D) الإكسوسفير"
+            ],
+            correct: 1,
+            info: "💡 معلومة علمية: تقع طبقة الأوزون في الجزء السفلي من طبقة الستراتوسفير، وتلعب دوراً حيوياً في امتصاص الأشعة فوق البنفسجية الضارة القادمة من الشمس."
+        },
+        {
+            q: "أيّ مما يلي يمثل بيانات نوعية؟",
+            options: [
+                "A) سرعة احتراق الوقود",
+                "B) درجة حرارة المحرك",
+                "C) رائحة احتراق الوقود",
+                "D) ارتفاع المركبة"
+            ],
+            correct: 2,
+            info: "💡 معلومة علمية: البيانات النوعية تصف الخصائص الفيزيائية ووصف المواد دون استخدام الأرقام، مثل الرائحة، اللون، أو الحالة الفيزيائية."
+        },
+        {
+            q: "أيّ مما يلي يمثل بيانات كمية؟",
+            options: [
+                "A) رائحة الوقود",
+                "B) لون اللهب",
+                "C) صوت المحرك",
+                "D) سرعة الاحتراق"
+            ],
+            correct: 3,
+            info: "💡 معلومة علمية: البيانات الكمية تعتمد على القياسات الرقمية والأعداد مثل السرعة، الكتلة، الحجم، ودرجة الحرارة."
+        }
+    ];
+
+    let currentQIdx = 0;
+
+    function startSlide3() {
+        currentQIdx = 0;
+        loadQuestion();
+    }
+
+    function loadQuestion() {
+        isCurrentQSolved = false;
+        document.getElementById('combustion-box').style.display = 'none';
+        document.getElementById('solved-count').innerText = currentQIdx;
+        document.getElementById('quiz-feedback').innerText = "";
+        
+        // إخفاء صندوق المعلومات عند تحميل سؤال جديد
+        const infoPanel = document.getElementById('question-info-panel');
+        if (infoPanel) {
+            infoPanel.classList.add('hidden');
+            infoPanel.innerText = "";
+        }
+
+        const qData = questions[currentQIdx];
+        document.getElementById('quiz-question').innerText = `السؤال ${currentQIdx + 1}: ${qData.q}`;
+
+        const optsContainer = document.getElementById('options-container');
+        optsContainer.innerHTML = '';
+
+        qData.options.forEach((opt, idx) => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = opt;
+            btn.onclick = () => handleAnswer(idx, btn);
+            optsContainer.appendChild(btn);
+        });
+    }
+
+    function handleAnswer(selectedIdx, btnElement) {
+        if (isCurrentQSolved) return;
+
+        const qData = questions[currentQIdx];
+        const feedback = document.getElementById('quiz-feedback');
+        const infoPanel = document.getElementById('question-info-panel');
+
+        if (selectedIdx === qData.correct) {
+            playSuccessSound();
+            isCurrentQSolved = true;
+            btnElement.classList.add('selected-correct');
+            
+            feedback.style.color = "var(--neon-green)";
+            feedback.innerText = "إجابة صحيحة! ✅ اضغط 'متابعة الرحلة 🚀' للسؤال التالي.";
+
+            // إظهار صندوق المعلومات التوضيحية عند الإجابة الصحيحة
+            if (infoPanel && qData.info) {
+                infoPanel.innerText = qData.info;
+                infoPanel.classList.remove('hidden');
+            }
+
+            if (qData.isCombustion) {
+                document.getElementById('combustion-box').style.display = 'block';
+                playRumbleSound(1.5);
+            }
+        } else {
+            playErrorSound();
+            feedback.style.color = "var(--neon-red)";
+            feedback.innerText = "إجابة خاطئة! ❌ حاول مرة أخرى.";
+
+            if (infoPanel) {
+                infoPanel.classList.add('hidden');
+            }
+
+            const viewport = document.getElementById('viewport');
+            viewport.classList.add('shake');
+            setTimeout(() => viewport.classList.remove('shake'), 400);
+        }
+    }
+
+    function prepareSlide4Cockpit() {
+        cockpitSystems = { 1: false, 2: false, 3: false };
+        for(let i=1; i<=3; i++) {
+            const b = document.getElementById(`cp-btn-${i}`);
+            b.classList.remove('active');
+            b.innerText = b.innerText.replace('تم التفعيل ✅', 'تفعيل');
+        }
+        const launchBtn = document.getElementById('launch-execute-btn');
+        launchBtn.classList.remove('ready');
+        launchBtn.setAttribute('disabled', 'true');
+        launchBtn.innerText = "🚀 إطلاق الصاروخ نحو الفضاء (بانتظار تفعيل الأنظمة)";
+
+        const infoBox = document.getElementById('cockpit-info-box');
+        infoBox.innerText = "📡 لوحة التحكم جاهزة. اضغط على أي زر تفاعلي لاستكشاف دوره في الإقلاع الكيميائي والفلكي.";
+        infoBox.style.borderColor = "#00f3ff";
+        infoBox.style.backgroundColor = "rgba(3, 8, 18, 0.95)";
+        infoBox.style.boxShadow = "0 0 25px rgba(0, 243, 255, 0.25)";
+
+        document.getElementById('cockpit-dashboard-ui').classList.remove('hidden');
+        document.getElementById('launch-phase').classList.add('hidden');
+        document.getElementById('transmission-phase').classList.add('hidden');
+    }
+
+    // دالة العد التنازلي المؤمنة بالكامل لشريحة قمرة القيادة
+    function startSlide4Countdown() {
+        document.getElementById('launch-phase').classList.remove('hidden');
+        document.getElementById('countdown-display').innerText = "3";
+        document.getElementById('countdown-display').style.color = "var(--neon-gold)";
+
+        let count = 3;
+        const countDisplay = document.getElementById('countdown-display');
+        
+        speakDeepEnglishVoice("Three");
+
+        const timer = setInterval(() => {
+            count--;
+            if (count === 2) {
+                countDisplay.innerText = "2";
+                speakDeepEnglishVoice("Two");
+            } else if (count === 1) {
+                countDisplay.innerText = "1";
+                speakDeepEnglishVoice("One");
+            } else if (count === 0) {
+                countDisplay.innerText = "LIFTOFF!";
+                countDisplay.style.color = "var(--neon-red)";
+                speakDeepEnglishVoice("LIFTOFF!");
+                playRumbleSound(3);
+                document.getElementById('viewport').classList.add('shake');
+                clearInterval(timer);
+                
+                setTimeout(() => {
+                    document.getElementById('viewport').classList.remove('shake');
+                    document.getElementById('launch-phase').classList.add('hidden');
+                    document.getElementById('transmission-phase').classList.remove('hidden');
+                    
+                    playStoryPart1Audio();
+                }, 2500);
+            }
+        }, 1200);
+    }
+
+    function chooseStory(choice) {
+        userStoryChoice = choice;
+        playBeep(500, 'sine', 0.1);
+        goToSlide(5);
+    }
+
+    function startSlide5() {
+        document.getElementById('global-next-btn').style.display = 'none';
+        document.getElementById('final-screen').classList.add('hidden');
+        const expansionBox = document.getElementById('story-expansion');
+        const destBox = document.getElementById('destination-box');
+
+        if (userStoryChoice === true) {
+            expansionBox.classList.remove('hidden');
+            destBox.style.display = 'none';
+
+            playStoryPart2Audio();
+        } else {
+            expansionBox.classList.add('hidden');
+            destBox.style.display = 'none';
+            showFinalScreen("تم إنهاء المهمة بناءً على رغبتك 🛑");
+        }
+    }
+
+    function showFinalScreen(customDesc = "تمت المحاكاة وتجاوز كافة الاختبارات بنجاح!") {
+        if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+        stopStoryAudio();
+
+        isFinalScreenReached = true;
+        document.getElementById('global-next-btn').style.display = 'none';
+        document.getElementById('story-expansion').classList.add('hidden');
+        document.getElementById('destination-box').style.display = 'none';
+        document.getElementById('final-desc').innerText = customDesc;
+        document.getElementById('final-screen').classList.remove('hidden');
+        playSuccessSound();
+    }
+
+    function restartEntireProject() {
+        if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+        stopStoryAudio();
+        stopAmbientSpaceSound();
+
+        playBeep(600, 'triangle', 0.2);
+        
+        isFinalScreenReached = false;
+        isSystemCheckPhase = false;
+        rocketProgress = 0; 
+
+        isSlide2Passed = false;
+        document.getElementById('slide2-status').innerText = '';
+        const dragContainer = document.getElementById('drag-container');
+        document.querySelectorAll('.draggable-item').forEach(item => {
+            dragContainer.appendChild(item);
+        });
+
+        isSlide3AlertActive = true;
+        document.getElementById('chem-alert-screen').classList.remove('hidden');
+        document.getElementById('quiz-card-box').classList.add('hidden');
+
+        currentQIdx = 0;
+        isCurrentQSolved = false;
+        document.getElementById('quiz-card-box').innerHTML = `
+            <div style="font-family: 'Orbitron'; color: var(--neon-red); font-size: 0.9rem; margin-bottom: 5px;">
+                ⚠️ CHEMISTRY SYSTEM MALFUNCTION — <span id="solved-count">0</span>/6 SOLVED
+            </div>
+            <h3 id="quiz-question">جاري تحميل السؤال...</h3>
+            <div class="options-grid" id="options-container"></div>
+            <div id="question-info-panel" class="question-info-panel hidden"></div>
+            <div id="combustion-box" class="combustion-anim">
+                🔥 FUEL + OXIDIZER → COMBUSTION → HOT GASES → THRUST
+            </div>
+            <div id="quiz-feedback" style="margin-top: 15px; font-weight: bold; min-height: 25px;"></div>
+        `;
+
+        document.getElementById('final-screen').classList.add('hidden');
+        goToSlide(0);
+    }
+
+    function exitProject() {
+        if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+        stopStoryAudio();
+        stopAmbientSpaceSound();
+        playBeep(300, 'sawtooth', 0.3);
+        alert("تم إغلاق المشروع بنجاح! شكراً لك.");
+        try {
+            window.close();
+        } catch (e) {}
+    }
+
+    function drawStationaryContinents(ctx, cx, cy, r) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        ctx.clip();
+
+        const fixedContinents = [
+            { pts: [{x:-0.1, y:-0.32}, {x:0.18, y:-0.35}, {x:0.32, y:-0.16}, {x:0.25, y:0.16}, {x:0.08, y:0.45}, {x:-0.05, y:0.38}, {x:-0.15, y:0.12}, {x:-0.12, y:-0.15}] },
+            { pts: [{x:-0.18, y:-0.62}, {x:0.2, y:-0.65}, {x:0.55, y:-0.52}, {x:0.75, y:-0.32}, {x:0.62, y:-0.14}, {x:0.38, y:-0.18}, {x:0.12, y:-0.32}, {x:-0.12, y:-0.38}] },
+            { pts: [{x:-0.72, y:-0.62}, {x:-0.42, y:-0.58}, {x:-0.32, y:-0.38}, {x:-0.44, y:-0.16}, {x:-0.65, y:-0.22}, {x:-0.78, y:-0.44}] },
+            { pts: [{x:-0.45, y:-0.08}, {x:-0.28, y:0.02}, {x:-0.24, y:0.22}, {x:-0.36, y:0.48}, {x:-0.48, y:0.22}] },
+            { pts: [{x:0.68, y:0.22}, {x:0.86, y:0.20}, {x:0.84, y:0.42}, {x:0.66, y:0.38}] }
+        ];
+
+        fixedContinents.forEach(c => {
+            ctx.beginPath();
+            c.pts.forEach((pt, idx) => {
+                const px = cx + pt.x * r * 1.05;
+                const py = cy + pt.y * r * 1.05;
+                if (idx === 0) ctx.moveTo(px, py);
+                else ctx.lineTo(px, py);
+            });
+            ctx.closePath();
+
+            ctx.fillStyle = '#2e7d32';
+            ctx.fill();
+            ctx.strokeStyle = 'rgba(129, 199, 132, 0.45)';
+            ctx.lineWidth = 1.2;
+            ctx.stroke();
+        });
+
+        const lightRim = ctx.createRadialGradient(
+            cx - r * 0.3, cy - r * 0.3, r * 0.4,
+            cx, cy, r
+        );
+        lightRim.addColorStop(0, 'rgba(0, 243, 255, 0.18)');
+        lightRim.addColorStop(0.85, 'rgba(0, 0, 0, 0)');
+        lightRim.addColorStop(1, 'rgba(0, 243, 255, 0.35)');
+
+        ctx.fillStyle = lightRim;
+        ctx.beginPath();
+        ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.restore();
+    }
+
+    function initEarthSimulation() {
+        const canvas = document.getElementById('earth-simulation-canvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resize();
+        window.addEventListener('resize', resize);
+
+        const rocketParticles = [];
+
+        const stars = Array.from({ length: 280 }, () => ({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            size: Math.random() * 2.8,
+            alpha: Math.random() * 0.8 + 0.2
+        }));
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#030712';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            stars.forEach(s => {
+                ctx.beginPath();
+                ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 255, 255, ${s.alpha})`;
+                ctx.shadowColor = '#ffffff';
+                ctx.shadowBlur = s.size > 2 ? 8 : 2;
+                ctx.fill();
+                ctx.shadowBlur = 0;
+
+                s.alpha += (Math.random() - 0.5) * 0.05;
+                if (s.alpha < 0.3) s.alpha = 0.3;
+                if (s.alpha > 1) s.alpha = 1;
+            });
+
+            const cx = window.innerWidth <= 768 ? window.innerWidth * 0.5 : window.innerWidth * 0.32;
+            const cy = window.innerWidth <= 768 ? window.innerHeight * 0.55 : window.innerHeight * 0.78;
+            const earthRadius = Math.min(window.innerWidth, window.innerHeight) * 0.35;
+
+            const layers = [
+                { nameEn: "Troposphere", nameAr: "التروبوسفير", r: earthRadius * 1.12, color: "rgba(0, 243, 255, 0.35)", alt: "12 km" },
+                { nameEn: "Stratosphere", nameAr: "الستراتوسفير", r: earthRadius * 1.28, color: "rgba(0, 180, 255, 0.25)", alt: "50 km" },
+                { nameEn: "Mesosphere", nameAr: "الميزوسفير", r: earthRadius * 1.45, color: "rgba(70, 120, 255, 0.18)", alt: "85 km" },
+                { nameEn: "Thermosphere", nameAr: "الثرموسفير", r: earthRadius * 1.65, color: "rgba(140, 60, 255, 0.12)", alt: "600 km" },
+                { nameEn: "Exosphere", nameAr: "الإكسوسفير", r: earthRadius * 1.88, color: "rgba(0, 243, 255, 0.08)", alt: "10000 km" }
+            ];
+
+            for (let i = layers.length - 1; i >= 0; i--) {
+                const layer = layers[i];
+                ctx.beginPath();
+                ctx.arc(cx, cy, layer.r, 0, Math.PI * 2);
+                ctx.fillStyle = layer.color;
+                ctx.fill();
+
+                ctx.save();
+                ctx.fillStyle = "rgba(255, 255, 255, 0.75)";
+                ctx.font = "bold 12px 'Tajawal', sans-serif";
+                ctx.textAlign = "center";
+                const labelAngle = -Math.PI * 0.25;
+                const lx = cx + Math.cos(labelAngle) * (layer.r - (layer.r - (i > 0 ? layers[i-1].r : earthRadius)) / 2);
+                const ly = cy + Math.sin(labelAngle) * (layer.r - (layer.r - (i > 0 ? layers[i-1].r : earthRadius)) / 2);
+                ctx.fillText(layer.nameAr, lx, ly);
+                ctx.restore();
+            }
+
+            const oceanGrad = ctx.createRadialGradient(
+                cx - earthRadius * 0.35, cy - earthRadius * 0.35, earthRadius * 0.05,
+                cx, cy, earthRadius
+            );
+            oceanGrad.addColorStop(0, '#0288d1');
+            oceanGrad.addColorStop(0.65, '#01579b');
+            oceanGrad.addColorStop(1, '#002f6c');
+
+            ctx.beginPath();
+            ctx.arc(cx, cy, earthRadius, 0, Math.PI * 2);
+            ctx.fillStyle = oceanGrad;
+            ctx.shadowColor = '#00f3ff';
+            ctx.shadowBlur = 35;
+            ctx.fill();
+            ctx.shadowBlur = 0;
+
+            drawStationaryContinents(ctx, cx, cy, earthRadius);
+
+            rocketProgress += 0.0005;
+            if (rocketProgress > 1.15) rocketProgress = 0;
+
+            const currentDist = earthRadius + rocketProgress * (earthRadius * 0.95);
+            const rocketAngle = -Math.PI * 0.32;
+            const rx = cx + Math.cos(rocketAngle) * currentDist;
+            const ry = cy + Math.sin(rocketAngle) * currentDist;
+
+            updateHUDByDistance(currentDist, earthRadius, layers);
+
+            for (let p = 0; p < 4; p++) {
+                rocketParticles.push({
+                    x: rx - Math.cos(rocketAngle) * 28 + (Math.random() - 0.5) * 6,
+                    y: ry - Math.sin(rocketAngle) * 28 + (Math.random() - 0.5) * 6,
+                    vx: -Math.cos(rocketAngle) * (2 + Math.random() * 2) + (Math.random() - 0.5),
+                    vy: -Math.sin(rocketAngle) * (2 + Math.random() * 2) + (Math.random() - 0.5),
+                    radius: 4 + Math.random() * 5,
+                    alpha: 1,
+                    color: Math.random() > 0.3 ? '#ffaa00' : '#ff3300'
+                });
+            }
+
+            for (let i = rocketParticles.length - 1; i >= 0; i--) {
+                const pt = rocketParticles[i];
+                pt.x += pt.vx;
+                pt.y += pt.vy;
+                pt.alpha -= 0.03;
+                pt.radius *= 0.97;
+
+                if (pt.alpha <= 0) {
+                    rocketParticles.splice(i, 1);
+                    continue;
+                }
+
+                ctx.beginPath();
+                ctx.arc(pt.x, pt.y, pt.radius, 0, Math.PI * 2);
+                ctx.fillStyle = pt.color;
+                ctx.globalAlpha = pt.alpha;
+                ctx.shadowColor = pt.color;
+                ctx.shadowBlur = 12;
+                ctx.fill();
+                ctx.shadowBlur = 0;
+                ctx.globalAlpha = 1;
+            }
+
+            ctx.save();
+            ctx.translate(rx, ry);
+            ctx.rotate(rocketAngle + Math.PI / 2);
+            ctx.scale(1.4, 1.4);
+
+            ctx.fillStyle = '#ff0055';
+            ctx.beginPath();
+            ctx.moveTo(-10, 16);
+            ctx.lineTo(-18, 28);
+            ctx.lineTo(-6, 25);
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.moveTo(10, 16);
+            ctx.lineTo(18, 28);
+            ctx.lineTo(6, 25);
+            ctx.closePath();
+            ctx.fill();
+
+            const rocketBody = ctx.createLinearGradient(-8, 0, 8, 0);
+            rocketBody.addColorStop(0, '#e0e0e0');
+            rocketBody.addColorStop(0.5, '#ffffff');
+            rocketBody.addColorStop(1, '#9e9e9e');
+
+            ctx.fillStyle = rocketBody;
+            ctx.beginPath();
+            ctx.moveTo(0, -28);
+            ctx.bezierCurveTo(9, -15, 9, 15, 8, 24);
+            ctx.lineTo(-8, 24);
+            ctx.bezierCurveTo(-9, 15, -9, -15, 0, -28);
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.fillStyle = '#ff0055';
+            ctx.beginPath();
+            ctx.moveTo(0, -28);
+            ctx.bezierCurveTo(4, -21, 5, -17, 6, -15);
+            ctx.lineTo(-6, -15);
+            ctx.bezierCurveTo(-5, -17, -4, -21, 0, -28);
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.arc(0, -5, 4, 0, Math.PI * 2);
+            ctx.fillStyle = '#00f3ff';
+            ctx.shadowColor = '#00f3ff';
+            ctx.shadowBlur = 10;
+            ctx.fill();
+            ctx.shadowBlur = 0;
+
+            ctx.fillStyle = '#424242';
+            ctx.fillRect(-6, 24, 12, 4);
+
+            ctx.restore();
+
+            requestAnimationFrame(draw);
+        }
+
+        function updateHUDByDistance(currentDist, earthRadius, layers) {
+            const altElem = document.getElementById('hud-altitude');
+            const layerElem = document.getElementById('hud-current-layer');
+            if (!altElem || !layerElem) return;
+
+            let currentLayerName = "TROPOSPHERE";
+            let activeIdx = 1;
+            let approxAltitude = 12;
+
+            if (currentDist < layers[0].r) {
+                currentLayerName = "TROPOSPHERE";
+                activeIdx = 1;
+                approxAltitude = Math.round(10 + (currentDist - earthRadius) * 2);
+            } else if (currentDist < layers[1].r) {
+                currentLayerName = "STRATOSPHERE";
+                activeIdx = 2;
+                approxAltitude = Math.round(25 + (currentDist - layers[0].r) * 4);
+            } else if (currentDist < layers[2].r) {
+                currentLayerName = "MESOSPHERE";
+                activeIdx = 3;
+                approxAltitude = Math.round(60 + (currentDist - layers[1].r) * 5);
+            } else if (currentDist < layers[3].r) {
+                currentLayerName = "THERMOSPHERE";
+                activeIdx = 4;
+                approxAltitude = Math.round(120 + (currentDist - layers[2].r) * 8);
+            } else {
+                currentLayerName = "EXOSPHERE";
+                activeIdx = 5;
+                approxAltitude = Math.round(650 + (currentDist - layers[3].r) * 20);
+            }
+
+            altElem.innerText = approxAltitude;
+            layerElem.innerText = currentLayerName;
+
+            for (let i = 1; i <= 5; i++) {
+                const item = document.getElementById(`layer-txt-${i}`);
+                if (item) {
+                    if (i === activeIdx) {
+                        item.style.opacity = "1";
+                        item.style.color = "var(--neon-green)";
+                        item.style.fontWeight = "bold";
+                    } else {
+                        item.style.opacity = "0.5";
+                        item.style.color = "#fff";
+                        item.style.fontWeight = "normal";
+                    }
+                }
+            }
+        }
+
+        draw();
+    }
+
+    function initBackgrounds() {
+        const c1 = document.getElementById('canvas-slide1');
+        if (c1) {
+            const ctx1 = c1.getContext('2d');
+            c1.width = c1.parentElement.clientWidth;
+            c1.height = c1.parentElement.clientHeight;
+            let angle = 0;
+            function drawRadar() {
+                ctx1.fillStyle = "rgba(3, 7, 18, 0.2)";
+                ctx1.fillRect(0, 0, c1.width, c1.height);
+                ctx1.strokeStyle = "rgba(255, 0, 85, 0.15)";
+                ctx1.lineWidth = 2;
+                ctx1.beginPath();
+                ctx1.arc(c1.width/2, c1.height/2, 150, 0, Math.PI*2);
+                ctx1.stroke();
+                
+                angle += 0.03;
+                ctx1.strokeStyle = "rgba(255, 0, 85, 0.4)";
+                ctx1.beginPath();
+                ctx1.moveTo(c1.width/2, c1.height/2);
+                ctx1.lineTo(c1.width/2 + Math.cos(angle)*200, c1.height/2 + Math.sin(angle)*200);
+                ctx1.stroke();
+                requestAnimationFrame(drawRadar);
+            }
+            drawRadar();
+        }
+
+        const c2 = document.getElementById('canvas-slide2');
+        if (c2) {
+            const ctx2 = c2.getContext('2d');
+            c2.width = c2.parentElement.clientWidth;
+            c2.height = c2.parentElement.clientHeight;
+            const particles = Array.from({length: 60}, () => ({
+                x: Math.random() * c2.width,
+                y: Math.random() * c2.height,
+                vx: (Math.random() - 0.5) * 0.8,
+                vy: (Math.random() - 0.5) * 0.8,
+                r: Math.random() * 3,
+                alpha: Math.random()
+            }));
+            function drawParticles() {
+                ctx2.fillStyle = "#030712";
+                ctx2.fillRect(0, 0, c2.width, c2.height);
+                particles.forEach(p => {
+                    p.x += p.vx; p.y += p.vy;
+                    if(p.x < 0) p.x = c2.width; if(p.x > c2.width) p.x = 0;
+                    if(p.y < 0) p.y = c2.height; if(p.y > c2.height) p.y = 0;
+                    ctx2.beginPath();
+                    ctx2.arc(p.x, p.y, p.r, 0, Math.PI*2);
+                    ctx2.fillStyle = `rgba(0, 243, 255, ${p.alpha})`;
+                    ctx2.shadowColor = '#00f3ff';
+                    ctx2.shadowBlur = 6;
+                    ctx2.fill();
+                    ctx2.shadowBlur = 0;
+                });
+                requestAnimationFrame(drawParticles);
+            }
+            drawParticles();
+        }
+
+        const c3 = document.getElementById('canvas-slide3');
+        if (c3) {
+            const ctx3 = c3.getContext('2d');
+            c3.width = c3.parentElement.clientWidth;
+            c3.height = c3.parentElement.clientHeight;
+            let t = 0;
+            function drawPlasma() {
+                t += 0.02;
+                ctx3.fillStyle = "rgba(3, 7, 18, 0.25)";
+                ctx3.fillRect(0, 0, c3.width, c3.height);
+                const grad = ctx3.createRadialGradient(
+                    c3.width/2 + Math.sin(t)*100, c3.height/2 + Math.cos(t)*50, 20,
+                    c3.width/2, c3.height/2, c3.width*0.6
+                );
+                grad.addColorStop(0, "rgba(255, 170, 0, 0.12)");
+                grad.addColorStop(1, "rgba(255, 0, 85, 0)");
+                ctx3.fillStyle = grad;
+                ctx3.fillRect(0, 0, c3.width, c3.height);
+                requestAnimationFrame(drawPlasma);
+            }
+            drawPlasma();
+        }
+
+        const c5 = document.getElementById('canvas-slide5');
+        if (c5) {
+            const ctx5 = c5.getContext('2d');
+            c5.width = c5.parentElement.clientWidth;
+            c5.height = c5.parentElement.clientHeight;
+            let scanY = 0;
+            function drawCRT() {
+                ctx5.fillStyle = "#030712";
+                ctx5.fillRect(0, 0, c5.width, c5.height);
+                scanY = (scanY + 2) % c5.height;
+                ctx5.fillStyle = "rgba(0, 255, 102, 0.08)";
+                ctx5.fillRect(0, scanY, c5.width, 4);
+                requestAnimationFrame(drawCRT);
+            }
+            drawCRT();
+        }
+    }
+
+    window.onload = () => {
+        initEarthSimulation();
+        initBackgrounds();
+        initStandardDragAndDrop();
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.getVoices();
+        }
+    };
+</script>
+
+</body>
+</html>
