@@ -420,21 +420,24 @@
             to { box-shadow: 0 0 20px rgba(0, 243, 255, 0.8); }
         }
 
+        /* تعديلات قمرة القيادة لتعمل بمرونة وتسمح بالتمرير الداخلي على الأيفون */
         .cockpit-dashboard {
             position: absolute;
             inset: 0;
             z-index: 25;
             background: radial-gradient(circle, rgba(2, 6, 23, 0.4) 30%, rgba(2, 6, 23, 0.95) 85%), 
                         linear-gradient(135deg, rgba(0,243,255,0.03) 0%, rgba(255,0,85,0.03) 100%);
-            border: 18px solid #080f1e;
-            border-top: 25px solid #080f1e;
-            border-radius: 24px;
+            border: 12px solid #080f1e;
+            border-top: 18px solid #080f1e;
+            border-radius: 20px;
             box-shadow: inset 0 0 50px rgba(0, 243, 255, 0.25);
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            padding: 30px;
+            padding: 15px 20px;
             pointer-events: none;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
         .cockpit-header-hud {
@@ -442,31 +445,33 @@
             justify-content: space-between;
             align-items: center;
             border-bottom: 2px dashed rgba(0, 243, 255, 0.3);
-            padding-bottom: 12px;
+            padding-bottom: 8px;
             pointer-events: auto;
+            flex-shrink: 0;
         }
 
         .cockpit-panel-container {
             pointer-events: auto;
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 10px;
             width: 100%;
             max-width: 850px;
             margin: 0 auto;
+            flex-shrink: 0;
         }
 
         .cockpit-panel {
             background: rgba(3, 8, 18, 0.92);
             border: 2px solid var(--neon-blue);
-            box-shadow: 0 0 30px rgba(0, 243, 255, 0.3), inset 0 0 15px rgba(0, 243, 255, 0.1);
-            padding: 18px 25px;
-            border-radius: 16px;
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.3), inset 0 0 15px rgba(0, 243, 255, 0.1);
+            padding: 12px 15px;
+            border-radius: 14px;
             display: flex;
             justify-content: space-around;
             align-items: center;
             flex-wrap: wrap;
-            gap: 15px;
+            gap: 10px;
             backdrop-filter: blur(12px);
         }
 
@@ -474,17 +479,17 @@
             background: linear-gradient(180deg, rgba(255,0,85,0.2) 0%, rgba(100,0,30,0.4) 100%);
             border: 2px solid var(--neon-red);
             color: #fff;
-            padding: 14px 26px;
-            border-radius: 10px;
+            padding: 10px 18px;
+            border-radius: 8px;
             font-family: 'Orbitron', sans-serif;
             font-weight: bold;
-            font-size: 0.95rem;
+            font-size: 0.85rem;
             cursor: pointer;
             transition: all 0.3s;
             box-shadow: 0 0 15px rgba(255, 0, 85, 0.3);
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
 
         .cockpit-btn.active {
@@ -498,17 +503,18 @@
             background: rgba(255, 170, 0, 0.2);
             border: 2px solid rgba(255, 170, 0, 0.4);
             color: rgba(255, 255, 255, 0.4);
-            padding: 14px 30px;
-            border-radius: 40px;
+            padding: 12px 20px;
+            border-radius: 30px;
             font-family: 'Orbitron', sans-serif;
             font-weight: 900;
-            font-size: 1.1rem;
+            font-size: 1rem;
             cursor: not-allowed;
             transition: all 0.4s;
             box-shadow: none;
             text-align: center;
             width: 100%;
-            letter-spacing: 2px;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
         }
 
         .btn-launch-execute.ready {
@@ -528,13 +534,13 @@
         .cockpit-info-screen {
             background: rgba(3, 8, 18, 0.95);
             border: 2px solid var(--neon-blue);
-            box-shadow: 0 0 25px rgba(0, 243, 255, 0.25);
-            padding: 20px 25px;
-            border-radius: 14px;
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.25);
+            padding: 12px 18px;
+            border-radius: 12px;
             color: #fff;
-            font-size: 1.15rem;
+            font-size: 0.95rem;
             font-weight: 700;
-            line-height: 1.7;
+            line-height: 1.5;
             text-align: center;
             max-width: 750px;
             margin: 0 auto;
@@ -969,13 +975,13 @@
         
         <div class="cockpit-dashboard" id="cockpit-dashboard-ui">
             <div class="cockpit-header-hud">
-                <span style="font-family:'Orbitron'; color:var(--neon-green); font-size:0.9rem;">⚡ COMMAND: SECURE</span>
-                <span style="font-family:'Orbitron'; color:var(--neon-gold); font-size:0.9rem;">MODULE: ORBIT-X</span>
+                <span style="font-family:'Orbitron'; color:var(--neon-green); font-size:0.85rem;">⚡ COMMAND: SECURE</span>
+                <span style="font-family:'Orbitron'; color:var(--neon-gold); font-size:0.85rem;">MODULE: ORBIT-X</span>
             </div>
             
-            <div style="text-align: center; margin: 5px 0;">
-                <h2 style="font-family: 'Orbitron'; color: var(--neon-blue); font-size: clamp(1.3rem, 2.8vw, 1.7rem); letter-spacing: 2px; margin-bottom: 5px;">غرفة تحكم إطلاق الصاروخ</h2>
-                <p style="font-size: clamp(0.85rem, 1.6vw, 1rem); color: #cbd5e1;">اضغط على أزرار الأنظمة لاستعراض دورها الفني، ثم اضغط زر الانطلاق بعد تفعيلها جميعاً</p>
+            <div style="text-align: center; margin: 2px 0;">
+                <h2 style="font-family: 'Orbitron'; color: var(--neon-blue); font-size: clamp(1.1rem, 2.3vw, 1.5rem); letter-spacing: 1px; margin-bottom: 2px;">غرفة تحكم إطلاق الصاروخ</h2>
+                <p style="font-size: clamp(0.78rem, 1.4vw, 0.9rem); color: #cbd5e1;">اضغط على أزرار الأنظمة لاستعراض دورها، ثم اضغط زر الانطلاق</p>
             </div>
 
             <div class="cockpit-panel-container">
@@ -984,9 +990,9 @@
                 </div>
 
                 <div class="cockpit-panel">
-                    <button class="cockpit-btn" id="cp-btn-1" onclick="toggleCockpitSystem(1)">⚙️ 1. تفعيل المؤكسد</button>
+                    <button class="cockpit-btn" id="cp-btn-1" onclick="toggleCockpitSystem(1)">⚙️ 1. المؤكسد</button>
                     <button class="cockpit-btn" id="cp-btn-2" onclick="toggleCockpitSystem(2)">⛽ 2. ضغط الوقود</button>
-                    <button class="cockpit-btn" id="cp-btn-3" onclick="toggleCockpitSystem(3)">🛰️ 3. توجيه الجيروسكوب</button>
+                    <button class="cockpit-btn" id="cp-btn-3" onclick="toggleCockpitSystem(3)">🛰️ 3. الجيروسكوب</button>
                 </div>
 
                 <button class="btn-launch-execute" id="launch-execute-btn" onclick="executeLaunchSequence()" disabled>
@@ -1051,7 +1057,7 @@
                 <p id="trans-text-2">
                     لَكِنَّ Sputnik لَمْ يَكُنْ سِوَى البِدَايَةِ…
                     <br>
-                    وَاصَلَ الإِنْسَانُ مُحَاوَلَاتِهِ لِلْوُصُولِ إِلَى الفَضَاءِ، حَتَّى جَاءَ اليَوْمُ الَّذِي تَغَيَّرَ فِيهِ كُلُّ شَيْءٍ.
+                    وَاصَلَ الإِنْسَانُ مُحَاوَلَاتِهِ لِلْوُصُولِ إِلَى الفَضَاءِ، حَتَّى جَاءَ اليَوْمُ الَّذِي تَغَيَّرَ فِيهِ كُلَّ شَيْءٍ.
                     <br>
                     فِي عَامِ 1961م، اِنْطَلَقَ Yuri Gagarin عَلَى مَتْنِ Vostok 1.
                     <br>
@@ -1869,7 +1875,7 @@
                 "D) سرعة الاحتراق"
             ],
             correct: 3,
-            info: "💡 معلومة علمية: البيانات الكمية تعتمد على القياسات الرقمية والأعداد مثل السرعة، الكتلة، الحجم، ودرجة الحرارة."
+            info: "💡 معلومة علمية: البيانات الكمية تعتمد على القياسات الرقمية والأعداد مثل السرعة، الكتلة, الحجم، ودرجة الحرارة."
         }
     ];
 
