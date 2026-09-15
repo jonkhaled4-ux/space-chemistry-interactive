@@ -176,8 +176,10 @@
             padding: 70px 1.5rem 1.5rem 1.5rem;
             background-size: cover;
             background-position: center;
-            overflow-y: auto; /* تفعيل التمرير لأعلى وأسفل لشاشات الهواتف والأجهزة اللوحية */
+            overflow-y: auto;
             -webkit-overflow-scrolling: touch;
+            width: 100vw;
+            height: 100vh;
         }
 
         .slide.active {
@@ -208,9 +210,10 @@
         #earth-simulation-canvas {
             position: absolute;
             inset: 0;
-            width: 100%;
-            height: 100%;
+            width: 100vw;
+            height: 100vh;
             z-index: 1;
+            display: block;
         }
 
         .hud-overlay {
@@ -236,6 +239,7 @@
             backdrop-filter: blur(5px);
             line-height: 1.7;
             max-width: 260px;
+            pointer-events: auto;
         }
 
         .hud-box h4 {
@@ -322,7 +326,6 @@
             direction: rtl;
         }
 
-        /* تحسين التوافق مع الأجهزة اللوحية والهواتف لصفحة الطبقات */
         @media (max-width: 900px) {
             .drop-zones {
                 grid-template-columns: repeat(3, 1fr);
@@ -379,7 +382,7 @@
             font-weight: bold;
             font-size: 1rem;
             color: #fff;
-            touch-action: none;
+            touch-action: none; /* مهم لمنع تعارض التمرير الافتراضي مع اللمس */
             transition: all 0.3s ease;
             text-align: center;
         }
@@ -392,6 +395,16 @@
 
         .draggable-item:active {
             cursor: grabbing;
+        }
+
+        /* عنصر العائم عند السحب باللمس */
+        .dragging-touch {
+            position: fixed !important;
+            z-index: 10000;
+            pointer-events: none;
+            opacity: 0.9;
+            transform: scale(1.1);
+            box-shadow: 0 0 30px var(--neon-green) !important;
         }
 
         .badges-container {
@@ -863,7 +876,7 @@
     </div>
 
     <!-- SLIDE 0 -->
-    <section id="slide-0" class="slide" style="padding: 0; width: 100%; height: 100%;">
+    <section id="slide-0" class="slide active" style="padding: 0; width: 100vw; height: 100vh;">
         <canvas id="earth-simulation-canvas"></canvas>
         
         <div class="hud-overlay">
@@ -904,7 +917,7 @@
         <canvas id="canvas-slide2" class="space-bg"></canvas>
         <div class="content-layer">
             <div class="atmosphere-challenge-wrapper">
-                <h3 style="margin-bottom: 5px; font-size: clamp(1rem, 2.2vw, 1.3rem); text-align: center;">🧪 التحدي: اسحب ورتّب طبقات الغلاف الجوي من سطح الأرض إلى الفضاء</h3>
+                <h3 style="margin-bottom: 5px; font-size: clamp(1rem, 2.2vw, 1.3rem); text-align: center;">🧪 التحدي: اسحب ورتّب طبقات الغلاف الجوي من سطح الأرض إلى الفضاء (يدعم اللمس والماوس)</h3>
                 
                 <div class="drop-zones" id="drop-zones">
                     <div class="drop-slot" data-index="0">1.<br>القريبة للأرض</div>
@@ -1674,21 +1687,14 @@
         'layer-exosphere'
     ];
 
-    let draggedItem = null;
-
-    function initStandardDragAndDrop() {
+    // دعم متكامل للماوس واللمس (الأجهزة اللوحية والموبايل)
+    function initTouchAndMouseDragAndDrop() {
         const items = document.querySelectorAll('.draggable-item');
         const slots = document.querySelectorAll('.drop-slot');
         const container = document.getElementById('drag-container');
 
         items.forEach(item => {
-            item.setAttribute('draggable', 'true');
-
-            item.addEventListener('dragstart', (e) => {
-                draggedItem = item;
-                e.dataTransfer.setData('text/plain', item.id);
-            });
-
+            // دعم النقر البسيط للأجهزة اللوحية
             item.addEventListener('click', () => {
                 for (let slot of slots) {
                     if (slot.children.length === 0) {
@@ -1696,6 +1702,73 @@
                         break;
                     }
                 }
+            });
+
+            // دعم السحب والإفلات باللمس (Touch Events)
+            let touchItem = null;
+            let cloneItem = null;
+
+            item.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                touchItem = item;
+                const touch = e.touches[0];
+
+                cloneItem = item.cloneNode(true);
+                cloneItem.classList.add('dragging-touch');
+                document.body.appendChild(cloneItem);
+                
+                cloneItem.style.left = (touch.clientX - 40) + 'px';
+                cloneItem.style.top = (touch.clientY - 40) + 'px';
+            }, { passive: false });
+
+            item.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+                if (!cloneItem) return;
+                const touch = e.touches[0];
+                cloneItem.style.left = (touch.clientX - 40) + 'px';
+                cloneItem.style.top = (touch.clientY - 40) + 'px';
+
+                // إضاءة الخانة المستهدفة عند التمرير فوقها
+                slots.forEach(slot => {
+                    const rect = slot.getBoundingClientRect();
+                    if (touch.clientX >= rect.left && touch.clientX <= rect.right &&
+                        touch.clientY >= rect.top && touch.clientY <= rect.bottom) {
+                        slot.classList.add('hovered');
+                    } else {
+                        slot.classList.remove('hovered');
+                    }
+                });
+            }, { passive: false });
+
+            item.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                if (!cloneItem) return;
+                const touch = e.changedTouches[0];
+                
+                let droppedOnSlot = false;
+                slots.forEach(slot => {
+                    slot.classList.remove('hovered');
+                    const rect = slot.getBoundingClientRect();
+                    if (touch.clientX >= rect.left && touch.clientX <= rect.right &&
+                        touch.clientY >= rect.top && touch.clientY <= rect.bottom) {
+                        droppedOnSlot = true;
+                        if (slot.children.length > 0) {
+                            container.appendChild(slot.children[0]);
+                        }
+                        slot.appendChild(touchItem);
+                    }
+                });
+
+                cloneItem.remove();
+                cloneItem = null;
+                touchItem = null;
+            });
+
+            // دعم الماوس العادي (Desktop)
+            item.setAttribute('draggable', 'true');
+            item.addEventListener('dragstart', (e) => {
+                e.dataTransfer.setData('text/plain', item.id);
+                window.draggedDesktopItem = item;
             });
         });
 
@@ -1712,11 +1785,12 @@
             slot.addEventListener('drop', (e) => {
                 e.preventDefault();
                 slot.classList.remove('hovered');
-                if (draggedItem) {
+                if (window.draggedDesktopItem) {
                     if (slot.children.length > 0) {
                         container.appendChild(slot.children[0]);
                     }
-                    slot.appendChild(draggedItem);
+                    slot.appendChild(window.draggedDesktopItem);
+                    window.draggedDesktopItem = null;
                 }
             });
         });
@@ -2445,7 +2519,7 @@
     window.onload = () => {
         initEarthSimulation();
         initBackgrounds();
-        initStandardDragAndDrop();
+        initTouchAndMouseDragAndDrop();
         if ('speechSynthesis' in window) {
             window.speechSynthesis.getVoices();
         }
