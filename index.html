@@ -308,7 +308,6 @@
             to { box-shadow: 0 0 40px rgba(255, 0, 85, 0.9); border-color: var(--neon-red); }
         }
 
-        /* حاوية التحدي متناسقة تماماً مع شاشات الآيفون الصغيرة والكبيرة */
         .atmosphere-challenge-wrapper {
             display: flex;
             flex-direction: column;
@@ -316,11 +315,13 @@
             width: 100%;
             max-width: 550px;
             align-items: center;
-            background: rgba(5, 12, 25, 0.9);
+            background: rgba(5, 12, 25, 0.95);
             padding: 15px;
             border-radius: 16px;
             border: 1px solid var(--border-glow);
             backdrop-filter: blur(10px);
+            z-index: 100;
+            pointer-events: auto;
         }
 
         .drop-zones {
@@ -360,26 +361,27 @@
         }
 
         .draggable-item {
-            padding: 10px 14px;
+            padding: 12px 18px;
             background: linear-gradient(135deg, rgba(0, 243, 255, 0.25) 0%, rgba(15, 23, 42, 0.95) 100%);
             border: 2px solid var(--neon-blue);
             border-radius: 8px;
             cursor: pointer;
             font-weight: bold;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             color: #fff;
-            transition: all 0.2s ease;
             text-align: center;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        .draggable-item:hover, .draggable-item:active {
+        .draggable-item:active {
             border-color: var(--neon-green);
-            background: rgba(0, 255, 102, 0.3);
-            transform: scale(1.03);
+            background: rgba(0, 255, 102, 0.4);
+            transform: scale(0.96);
         }
 
         .draggable-item.used {
-            opacity: 0.3;
+            opacity: 0.25;
             pointer-events: none;
             transform: scale(0.95);
         }
@@ -889,12 +891,12 @@
         </div>
     </section>
 
-    <!-- SLIDE 2: صفحة ترتيب الطبقات المتوافقة 100% مع الآيفون وسفاري -->
+    <!-- SLIDE 2: صفحة ترتيب الطبقات مع دعم كامل وسريع للنقر باللمس على الآيفون -->
     <section id="slide-2" class="slide">
         <canvas id="canvas-slide2" class="space-bg"></canvas>
         <div class="content-layer">
             <div class="atmosphere-challenge-wrapper">
-                <h3 style="font-size: clamp(0.85rem, 1.8vw, 1.05rem); text-align: center; color: var(--neon-blue);">🧪 ترتيب طبقات الغلاف الجوي (انقر للتسكين بالترتيب)</h3>
+                <h3 style="font-size: clamp(0.85rem, 1.8vw, 1.05rem); text-align: center; color: var(--neon-blue);">🧪 ترتيب طبقات الغلاف الجوي (انقر لتسكين الطبقات)</h3>
                 
                 <div class="drop-zones" id="drop-zones">
                     <div class="drop-slot" data-index="0"><span>1. القريبة للأرض</span></div>
@@ -905,16 +907,16 @@
                 </div>
 
                 <div class="drag-container" id="drag-container">
-                    <div class="draggable-item" data-id="layer-exosphere" onclick="selectLayer(this)">الإكسوسفير</div>
-                    <div class="draggable-item" data-id="layer-troposphere" onclick="selectLayer(this)">التروبوسفير</div>
-                    <div class="draggable-item" data-id="layer-thermosphere" onclick="selectLayer(this)">الثرموسفير</div>
-                    <div class="draggable-item" data-id="layer-mesosphere" onclick="selectLayer(this)">الميزوسفير</div>
-                    <div class="draggable-item" data-id="layer-stratosphere" onclick="selectLayer(this)">الستراتوسفير</div>
+                    <div class="draggable-item" data-id="layer-exosphere" ontouchstart="selectLayer(event, this)" onclick="selectLayer(event, this)">الإكسوسفير</div>
+                    <div class="draggable-item" data-id="layer-troposphere" ontouchstart="selectLayer(event, this)" onclick="selectLayer(event, this)">التروبوسفير</div>
+                    <div class="draggable-item" data-id="layer-thermosphere" ontouchstart="selectLayer(event, this)" onclick="selectLayer(event, this)">الثرموسفير</div>
+                    <div class="draggable-item" data-id="layer-mesosphere" ontouchstart="selectLayer(event, this)" onclick="selectLayer(event, this)">الميزوسفير</div>
+                    <div class="draggable-item" data-id="layer-stratosphere" ontouchstart="selectLayer(event, this)" onclick="selectLayer(event, this)">الستراتوسفير</div>
                 </div>
 
                 <div style="display: flex; gap: 8px; margin-top: 5px;">
-                    <button class="btn-action" onclick="checkAtmosphereOrder()">التحقق 🧪</button>
-                    <button class="btn-action" onclick="resetAtmosphereOrder()" style="border-color: var(--neon-red); color: var(--neon-red);">إعادة 🔄</button>
+                    <button class="btn-action" ontouchstart="checkAtmosphereOrder()" onclick="checkAtmosphereOrder()">التحقق 🧪</button>
+                    <button class="btn-action" ontouchstart="resetAtmosphereOrder()" onclick="resetAtmosphereOrder()" style="border-color: var(--neon-red); color: var(--neon-red);">إعادة 🔄</button>
                 </div>
                 <div id="slide2-status" style="font-weight: bold; min-height: 20px; font-size: 0.85rem; text-align: center;"></div>
             </div>
@@ -1665,8 +1667,12 @@
         'layer-exosphere'
     ];
 
-    // نظام التسكين بالنقر السهل والمثالي للأجهزة اللوحية والهواتف (الآيفون)
-    function selectLayer(itemElem) {
+    // استجابة فورية لأحداث اللمس والنقر على الآيفون والمتصفحات
+    function selectLayer(event, itemElem) {
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
         if (itemElem.classList.contains('used')) return;
 
         const slots = document.querySelectorAll('.drop-slot');
