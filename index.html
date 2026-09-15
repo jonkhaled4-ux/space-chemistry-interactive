@@ -373,7 +373,6 @@
             white-space: nowrap;
         }
 
-        /* تنسيق موحد وصغير للعنصر عندما يكون داخل مربع الإفلات لكي لا يتجاوز حجم الصفحة أو الصندوق */
         .drop-slot .draggable-item {
             width: 100%;
             padding: 4px 6px;
@@ -842,6 +841,7 @@
 <body>
 
 <audio id="story-audio-player" src="story_audio.mp3" preload="auto"></audio>
+<audio id="story-audio-alert" src="story_audio1.mp3" preload="auto"></audio>
 
 <div id="viewport">
 
@@ -1134,6 +1134,7 @@
     };
 
     const storyAudio = document.getElementById('story-audio-player');
+    const alertAudio = document.getElementById('story-audio-alert');
     const PART1_END_TIME = 25.20; 
     let audioTimeUpdateHandler = null;
 
@@ -1154,10 +1155,19 @@
             btn.innerText = "🔇 الصوت: كتم";
             if (audioCtx) audioCtx.suspend();
             if (storyAudio) storyAudio.muted = true;
+            if (alertAudio) alertAudio.muted = true;
         } else {
             btn.innerText = "🔊 الصوت: مفعل";
             if (audioCtx) audioCtx.resume();
             if (storyAudio) storyAudio.muted = false;
+            if (alertAudio) alertAudio.muted = false;
+        }
+    }
+
+    function stopAlertAudio() {
+        if (alertAudio) {
+            alertAudio.pause();
+            alertAudio.currentTime = 0;
         }
     }
 
@@ -1498,6 +1508,7 @@
     function goToSlide(slideIndex) {
         if ('speechSynthesis' in window) window.speechSynthesis.cancel();
         stopStoryAudio();
+        stopAlertAudio();
 
         if (slideIndex !== 0) {
             stopAmbientSpaceSound();
@@ -1516,6 +1527,10 @@
             document.getElementById('global-next-btn').style.display = 'flex';
             document.getElementById('global-next-btn').innerText = "متابعة الرحلة 🚀";
             startLoopingSiren();
+            if (alertAudio && !isAudioMuted) {
+                alertAudio.currentTime = 0;
+                alertAudio.play().catch(e => console.log(e));
+            }
         } else if (currentSlide === 3) {
             if (isSlide3AlertActive) {
                 document.getElementById('slide-indicator').innerText = `CHEMISTRY ALERT`;
@@ -1568,6 +1583,7 @@
 
         if (currentSlide === 1) {
             stopSiren();
+            stopAlertAudio();
             goToSlide(2);
             return;
         }
@@ -2010,6 +2026,7 @@
     function showFinalScreen(customDesc = "تمت المحاكاة وتجاوز كافة الاختبارات بنجاح!") {
         if ('speechSynthesis' in window) window.speechSynthesis.cancel();
         stopStoryAudio();
+        stopAlertAudio();
 
         isFinalScreenReached = true;
         document.getElementById('global-next-btn').style.display = 'none';
@@ -2023,6 +2040,7 @@
     function restartEntireProject() {
         if ('speechSynthesis' in window) window.speechSynthesis.cancel();
         stopStoryAudio();
+        stopAlertAudio();
         stopAmbientSpaceSound();
 
         playBeep(600, 'triangle', 0.2);
@@ -2065,6 +2083,7 @@
     function exitProject() {
         if ('speechSynthesis' in window) window.speechSynthesis.cancel();
         stopStoryAudio();
+        stopAlertAudio();
         stopAmbientSpaceSound();
         playBeep(300, 'sawtooth', 0.3);
         alert("تم إغلاق المشروع بنجاح! شكراً لك.");
