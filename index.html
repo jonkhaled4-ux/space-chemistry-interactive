@@ -1174,7 +1174,11 @@
     function startAmbientSpaceSound() {
         if (isAudioMuted) return;
         initAudio();
-        if (audioCtx.state !== 'running') return;
+        if (audioCtx) {
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
         stopAmbientSpaceSound();
 
         const now = audioCtx.currentTime;
@@ -1314,6 +1318,7 @@
     function playStoryPart1Audio() {
         if (isAudioMuted) return;
         if (!storyAudio) return;
+        initAudio();
         stopStoryAudio();
 
         playRadioPTTBeep();
@@ -1336,6 +1341,7 @@
     function playStoryPart2Audio() {
         if (isAudioMuted) return;
         if (!storyAudio) return;
+        initAudio();
         if (audioTimeUpdateHandler) {
             storyAudio.removeEventListener('timeupdate', audioTimeUpdateHandler);
         }
@@ -1506,6 +1512,7 @@
     }
 
     function goToSlide(slideIndex) {
+        initAudio();
         if ('speechSynthesis' in window) window.speechSynthesis.cancel();
         stopStoryAudio();
         stopAlertAudio();
@@ -2038,6 +2045,7 @@
     }
 
     function restartEntireProject() {
+        initAudio();
         if ('speechSynthesis' in window) window.speechSynthesis.cancel();
         stopStoryAudio();
         stopAlertAudio();
