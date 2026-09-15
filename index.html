@@ -171,9 +171,9 @@
             transition: opacity 1s ease-in-out;
             display: flex;
             flex-direction: column;
-            justify-content: flex-start;
+            justify-content: center;
             align-items: center;
-            padding: 70px 1.5rem 1.5rem 1.5rem;
+            padding: 60px 1rem 1rem 1rem;
             background-size: cover;
             background-position: center;
             overflow-y: auto;
@@ -199,7 +199,7 @@
             position: relative;
             z-index: 10;
             width: 100%;
-            min-height: 100%;
+            max-width: 800px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -308,103 +308,80 @@
             to { box-shadow: 0 0 40px rgba(255, 0, 85, 0.9); border-color: var(--neon-red); }
         }
 
+        /* تنسيق متناسق لصفحة ترتيب الطبقات خصيصاً لشاشات الآيفون والموبايل */
         .atmosphere-challenge-wrapper {
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 12px;
             width: 100%;
-            max-width: 1100px;
+            max-width: 650px;
             align-items: center;
-            padding: 15px 0;
+            background: rgba(5, 12, 25, 0.85);
+            padding: 15px;
+            border-radius: 16px;
+            border: 1px solid var(--border-glow);
+            backdrop-filter: blur(10px);
         }
 
         .drop-zones {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
             width: 100%;
-            direction: rtl;
-        }
-
-        @media (max-width: 900px) {
-            .drop-zones {
-                grid-template-columns: repeat(3, 1fr);
-            }
-        }
-        @media (max-width: 600px) {
-            .drop-zones {
-                grid-template-columns: 1fr;
-            }
         }
 
         .drop-slot {
-            min-height: 85px;
+            min-height: 45px;
             border: 2px dashed var(--neon-blue);
             background: rgba(0, 243, 255, 0.08);
-            border-radius: 12px;
+            border-radius: 8px;
             display: flex;
-            flex-direction: column;
             align-items: center;
-            justify-content: center;
-            font-size: 0.85rem;
+            justify-content: space-between;
+            padding: 0 15px;
+            font-size: 0.9rem;
             color: #cbd5e1;
             font-weight: bold;
-            box-shadow: 0 0 15px rgba(0, 243, 255, 0.1);
-            transition: all 0.3s;
-            text-align: center;
-            padding: 8px;
         }
 
-        .drop-slot.hovered {
-            background: rgba(0, 255, 102, 0.25);
+        .drop-slot.filled {
             border-style: solid;
             border-color: var(--neon-green);
-            box-shadow: 0 0 25px var(--neon-green);
-            transform: scale(1.02);
+            background: rgba(0, 255, 102, 0.15);
+            color: #fff;
         }
 
         .drag-container {
             display: flex;
-            gap: 12px;
+            gap: 8px;
             flex-wrap: wrap;
             justify-content: center;
             width: 100%;
-            min-height: 70px;
         }
 
         .draggable-item {
-            padding: 12px 20px;
+            padding: 10px 16px;
             background: linear-gradient(135deg, rgba(0, 243, 255, 0.25) 0%, rgba(15, 23, 42, 0.95) 100%);
             border: 2px solid var(--neon-blue);
-            box-shadow: 0 0 20px rgba(0, 243, 255, 0.3);
-            border-radius: 10px;
-            cursor: grab;
+            border-radius: 8px;
+            cursor: pointer;
             font-weight: bold;
-            font-size: 1rem;
+            font-size: 0.95rem;
             color: #fff;
-            touch-action: none; /* مهم لمنع تعارض التمرير الافتراضي مع اللمس */
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             text-align: center;
         }
 
-        .draggable-item:hover {
+        .draggable-item:hover, .draggable-item:active {
             border-color: var(--neon-green);
-            box-shadow: 0 0 25px var(--neon-green);
-            transform: translateY(-3px);
+            background: rgba(0, 255, 102, 0.3);
+            transform: scale(1.03);
         }
 
-        .draggable-item:active {
-            cursor: grabbing;
-        }
-
-        /* عنصر العائم عند السحب باللمس */
-        .dragging-touch {
-            position: fixed !important;
-            z-index: 10000;
+        .draggable-item.used {
+            opacity: 0.3;
             pointer-events: none;
-            opacity: 0.9;
-            transform: scale(1.1);
-            box-shadow: 0 0 30px var(--neon-green) !important;
+            transform: scale(0.95);
         }
 
         .badges-container {
@@ -757,8 +734,8 @@
             background: transparent;
             border: 2px solid var(--neon-blue);
             color: var(--neon-blue);
-            padding: 10px 30px;
-            font-size: 1.1rem;
+            padding: 8px 25px;
+            font-size: 1rem;
             font-family: 'Orbitron', 'Tajawal', sans-serif;
             cursor: pointer;
             border-radius: 5px;
@@ -912,33 +889,34 @@
         </div>
     </section>
 
-    <!-- SLIDE 2 -->
+    <!-- SLIDE 2: صفحة ترتيب الطبقات المتوافقة كلياً مع اللمس والآيفون -->
     <section id="slide-2" class="slide">
         <canvas id="canvas-slide2" class="space-bg"></canvas>
         <div class="content-layer">
             <div class="atmosphere-challenge-wrapper">
-                <h3 style="margin-bottom: 5px; font-size: clamp(1rem, 2.2vw, 1.3rem); text-align: center;">🧪 التحدي: اسحب ورتّب طبقات الغلاف الجوي من سطح الأرض إلى الفضاء (يدعم اللمس والماوس)</h3>
+                <h3 style="font-size: clamp(0.95rem, 2vw, 1.15rem); text-align: center; color: var(--neon-blue);">🧪 ترتيب طبقات الغلاف الجوي (انقر على الطبقة لوضعها بالترتيب)</h3>
                 
                 <div class="drop-zones" id="drop-zones">
-                    <div class="drop-slot" data-index="0">1.<br>القريبة للأرض</div>
-                    <div class="drop-slot" data-index="1">2.<br>الطبقة الثانية</div>
-                    <div class="drop-slot" data-index="2">3.<br>الطبقة الثالثة</div>
-                    <div class="drop-slot" data-index="3">4.<br>الطبقة الرابعة</div>
-                    <div class="drop-slot" data-index="4">5.<br>الأبعد (الفضاء)</div>
+                    <div class="drop-slot" data-index="0"><span>1. القريبة للأرض</span></div>
+                    <div class="drop-slot" data-index="1"><span>2. الطبقة الثانية</span></div>
+                    <div class="drop-slot" data-index="2"><span>3. الطبقة الثالثة</span></div>
+                    <div class="drop-slot" data-index="3"><span>4. الطبقة الرابعة</span></div>
+                    <div class="drop-slot" data-index="4"><span>5. الأبعد (الفضاء)</span></div>
                 </div>
 
                 <div class="drag-container" id="drag-container">
-                    <div class="draggable-item" id="layer-exosphere">الإكسوسفير</div>
-                    <div class="draggable-item" id="layer-troposphere">التروبوسفير</div>
-                    <div class="draggable-item" id="layer-thermosphere">الثرموسفير</div>
-                    <div class="draggable-item" id="layer-mesosphere">الميزوسفير</div>
-                    <div class="draggable-item" id="layer-stratosphere">الستراتوسفير</div>
+                    <div class="draggable-item" data-id="layer-exosphere" onclick="selectLayer(this)">الإكسوسفير</div>
+                    <div class="draggable-item" data-id="layer-troposphere" onclick="selectLayer(this)">التروبوسفير</div>
+                    <div class="draggable-item" data-id="layer-thermosphere" onclick="selectLayer(this)">الثرموسفير</div>
+                    <div class="draggable-item" data-id="layer-mesosphere" onclick="selectLayer(this)">الميزوسفير</div>
+                    <div class="draggable-item" data-id="layer-stratosphere" onclick="selectLayer(this)">الستراتوسفير</div>
                 </div>
 
-                <div style="margin-top: 10px;">
-                    <button class="btn-action" onclick="checkAtmosphereOrder()">التحقق من الترتيب 🧪</button>
+                <div style="display: flex; gap: 10px; margin-top: 5px;">
+                    <button class="btn-action" onclick="checkAtmosphereOrder()">التحقق 🧪</button>
+                    <button class="btn-action" onclick="resetAtmosphereOrder()" style="border-color: var(--neon-red); color: var(--neon-red);">إعادة 🔄</button>
                 </div>
-                <div id="slide2-status" style="margin-top: 8px; font-weight: bold; height: 25px; font-size: 0.95rem;"></div>
+                <div id="slide2-status" style="font-weight: bold; min-height: 22px; font-size: 0.9rem; text-align: center;"></div>
             </div>
         </div>
     </section>
@@ -1593,7 +1571,7 @@
                 playErrorSound();
                 const statusDiv = document.getElementById('slide2-status');
                 statusDiv.style.color = "var(--neon-red)";
-                statusDiv.innerText = "⚠️ يجب ترتيب طبقات الغلاف الجوي بشكل صحيح والتحقق منها قبل متابعة الرحلة!";
+                statusDiv.innerText = "⚠️ يجب ترتيب الطبقات بشكل صحيح والتحقق منها أولاً!";
                 
                 const viewport = document.getElementById('viewport');
                 viewport.classList.add('shake');
@@ -1687,112 +1665,43 @@
         'layer-exosphere'
     ];
 
-    // دعم متكامل للماوس واللمس (الأجهزة اللوحية والموبايل)
-    function initTouchAndMouseDragAndDrop() {
-        const items = document.querySelectorAll('.draggable-item');
+    // نظام التسكين بالنقر السهل والمثالي للأجهزة اللوحية والهواتف (الآيفون)
+    function selectLayer(itemElem) {
+        if (itemElem.classList.contains('used')) return;
+
         const slots = document.querySelectorAll('.drop-slot');
-        const container = document.getElementById('drag-container');
+        for (let slot of slots) {
+            if (!slot.dataset.layerId) {
+                slot.dataset.layerId = itemElem.dataset.id;
+                slot.querySelector('span').innerText = itemElem.innerText;
+                slot.classList.add('filled');
+                itemElem.classList.add('used');
+                playBeep(600, 'sine', 0.08);
+                break;
+            }
+        }
+    }
 
-        items.forEach(item => {
-            // دعم النقر البسيط للأجهزة اللوحية
-            item.addEventListener('click', () => {
-                for (let slot of slots) {
-                    if (slot.children.length === 0) {
-                        slot.appendChild(item);
-                        break;
-                    }
-                }
-            });
-
-            // دعم السحب والإفلات باللمس (Touch Events)
-            let touchItem = null;
-            let cloneItem = null;
-
-            item.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                touchItem = item;
-                const touch = e.touches[0];
-
-                cloneItem = item.cloneNode(true);
-                cloneItem.classList.add('dragging-touch');
-                document.body.appendChild(cloneItem);
-                
-                cloneItem.style.left = (touch.clientX - 40) + 'px';
-                cloneItem.style.top = (touch.clientY - 40) + 'px';
-            }, { passive: false });
-
-            item.addEventListener('touchmove', (e) => {
-                e.preventDefault();
-                if (!cloneItem) return;
-                const touch = e.touches[0];
-                cloneItem.style.left = (touch.clientX - 40) + 'px';
-                cloneItem.style.top = (touch.clientY - 40) + 'px';
-
-                // إضاءة الخانة المستهدفة عند التمرير فوقها
-                slots.forEach(slot => {
-                    const rect = slot.getBoundingClientRect();
-                    if (touch.clientX >= rect.left && touch.clientX <= rect.right &&
-                        touch.clientY >= rect.top && touch.clientY <= rect.bottom) {
-                        slot.classList.add('hovered');
-                    } else {
-                        slot.classList.remove('hovered');
-                    }
-                });
-            }, { passive: false });
-
-            item.addEventListener('touchend', (e) => {
-                e.preventDefault();
-                if (!cloneItem) return;
-                const touch = e.changedTouches[0];
-                
-                let droppedOnSlot = false;
-                slots.forEach(slot => {
-                    slot.classList.remove('hovered');
-                    const rect = slot.getBoundingClientRect();
-                    if (touch.clientX >= rect.left && touch.clientX <= rect.right &&
-                        touch.clientY >= rect.top && touch.clientY <= rect.bottom) {
-                        droppedOnSlot = true;
-                        if (slot.children.length > 0) {
-                            container.appendChild(slot.children[0]);
-                        }
-                        slot.appendChild(touchItem);
-                    }
-                });
-
-                cloneItem.remove();
-                cloneItem = null;
-                touchItem = null;
-            });
-
-            // دعم الماوس العادي (Desktop)
-            item.setAttribute('draggable', 'true');
-            item.addEventListener('dragstart', (e) => {
-                e.dataTransfer.setData('text/plain', item.id);
-                window.draggedDesktopItem = item;
-            });
+    function resetAtmosphereOrder() {
+        playBeep(300, 'sine', 0.1);
+        isSlide2Passed = false;
+        document.getElementById('slide2-status').innerText = "";
+        
+        document.querySelectorAll('.drop-slot').forEach((slot, idx) => {
+            slot.removeAttribute('data-layer-id');
+            slot.classList.remove('filled');
+            const defaultNames = [
+                "1. القريبة للأرض",
+                "2. الطبقة الثانية",
+                "3. الطبقة الثالثة",
+                "4. الطبقة الرابعة",
+                "5. الأبعد (الفضاء)"
+            ];
+            slot.querySelector('span').innerText = defaultNames[idx];
         });
 
-        slots.forEach(slot => {
-            slot.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                slot.classList.add('hovered');
-            });
-
-            slot.addEventListener('dragleave', () => {
-                slot.classList.remove('hovered');
-            });
-
-            slot.addEventListener('drop', (e) => {
-                e.preventDefault();
-                slot.classList.remove('hovered');
-                if (window.draggedDesktopItem) {
-                    if (slot.children.length > 0) {
-                        container.appendChild(slot.children[0]);
-                    }
-                    slot.appendChild(window.draggedDesktopItem);
-                    window.draggedDesktopItem = null;
-                }
-            });
+        document.querySelectorAll('.draggable-item').forEach(item => {
+            item.classList.remove('used');
         });
     }
 
@@ -1800,8 +1709,8 @@
         const slots = document.querySelectorAll('.drop-slot');
         let currentOrder = [];
         slots.forEach(slot => {
-            if (slot.children.length > 0) {
-                currentOrder.push(slot.children[0].id);
+            if (slot.dataset.layerId) {
+                currentOrder.push(slot.dataset.layerId);
             }
         });
 
@@ -1811,7 +1720,7 @@
             playErrorSound();
             isSlide2Passed = false;
             statusDiv.style.color = "var(--neon-red)";
-            statusDiv.innerText = "❌ يُرجى وضع كافة الطبقات في أماكنها أولاً";
+            statusDiv.innerText = "❌ يرجى اختيار وتعبئة كافة الطبقات أولاً";
             return;
         }
 
@@ -1821,12 +1730,12 @@
             playSuccessSound();
             isSlide2Passed = true;
             statusDiv.style.color = "var(--neon-green)";
-            statusDiv.innerText = "✅ PATH CORRECTED — تم تصحيح المسار (اضغط 'متابعة الرحلة 🚀' للمتابعة)";
+            statusDiv.innerText = "✅ تم تصحيح المسار بنجاح! (اضغط متابعة الرحلة 🚀)";
         } else {
             playErrorSound();
             isSlide2Passed = false;
             statusDiv.style.color = "var(--neon-red)";
-            statusDiv.innerText = "❌ INCORRECT ORDER — أعد المحاولة";
+            statusDiv.innerText = "❌ الترتيب غير صحيح، اضغط (إعادة 🔄) وحاول مجدداً";
         }
     }
 
@@ -2081,12 +1990,7 @@
         isSystemCheckPhase = false;
         rocketProgress = 0; 
 
-        isSlide2Passed = false;
-        document.getElementById('slide2-status').innerText = '';
-        const dragContainer = document.getElementById('drag-container');
-        document.querySelectorAll('.draggable-item').forEach(item => {
-            dragContainer.appendChild(item);
-        });
+        resetAtmosphereOrder();
 
         isSlide3AlertActive = true;
         document.getElementById('chem-alert-screen').classList.remove('hidden');
@@ -2519,7 +2423,6 @@
     window.onload = () => {
         initEarthSimulation();
         initBackgrounds();
-        initTouchAndMouseDragAndDrop();
         if ('speechSynthesis' in window) {
             window.speechSynthesis.getVoices();
         }
