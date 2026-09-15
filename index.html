@@ -393,6 +393,7 @@
             border: 2px solid var(--neon-blue);
             border-radius: 8px;
             cursor: pointer;
+            font-family: 'Tajawal', sans-serif;
             font-weight: bold;
             font-size: 0.95rem;
             color: #fff;
@@ -401,6 +402,8 @@
             -webkit-tap-highlight-color: transparent;
             -webkit-user-select: none;
             user-select: none;
+            -webkit-appearance: none;
+            appearance: none;
         }
 
         .draggable-item:active {
@@ -448,6 +451,23 @@
                 flex: 1 1 calc(50% - 8px);
                 max-width: calc(50% - 4px);
             }
+        }
+
+
+        #slide-2 .content-layer,
+        #slide-2 .atmosphere-challenge-wrapper,
+        #slide-2 .drop-zones,
+        #slide-2 .drag-container {
+            pointer-events: auto;
+        }
+
+        #slide-2 canvas.space-bg {
+            pointer-events: none;
+        }
+
+        #slide-2 button {
+            position: relative;
+            z-index: 120;
         }
 
         .badges-container {
@@ -968,19 +988,19 @@
                 </p>
 
                 <div class="drop-zones" id="drop-zones">
-                    <div class="drop-slot" data-index="0" role="button" tabindex="0"><span>1. القريبة للأرض</span></div>
-                    <div class="drop-slot" data-index="1" role="button" tabindex="0"><span>2. الطبقة الثانية</span></div>
-                    <div class="drop-slot" data-index="2" role="button" tabindex="0"><span>3. الطبقة الثالثة</span></div>
-                    <div class="drop-slot" data-index="3" role="button" tabindex="0"><span>4. الطبقة الرابعة</span></div>
-                    <div class="drop-slot" data-index="4" role="button" tabindex="0"><span>5. الأبعد (الفضاء)</span></div>
+                    <button type="button" class="drop-slot" data-index="0" onclick="handleAtmosphereSlotActivation(this)"><span>1. القريبة للأرض</span></button>
+                    <button type="button" class="drop-slot" data-index="1" onclick="handleAtmosphereSlotActivation(this)"><span>2. الطبقة الثانية</span></button>
+                    <button type="button" class="drop-slot" data-index="2" onclick="handleAtmosphereSlotActivation(this)"><span>3. الطبقة الثالثة</span></button>
+                    <button type="button" class="drop-slot" data-index="3" onclick="handleAtmosphereSlotActivation(this)"><span>4. الطبقة الرابعة</span></button>
+                    <button type="button" class="drop-slot" data-index="4" onclick="handleAtmosphereSlotActivation(this)"><span>5. الأبعد (الفضاء)</span></button>
                 </div>
 
                 <div class="drag-container" id="drag-container">
-                    <div class="draggable-item" id="layer-exosphere" data-id="layer-exosphere" draggable="true" role="button" tabindex="0">الإكسوسفير</div>
-                    <div class="draggable-item" id="layer-troposphere" data-id="layer-troposphere" draggable="true" role="button" tabindex="0">التروبوسفير</div>
-                    <div class="draggable-item" id="layer-thermosphere" data-id="layer-thermosphere" draggable="true" role="button" tabindex="0">الثرموسفير</div>
-                    <div class="draggable-item" id="layer-mesosphere" data-id="layer-mesosphere" draggable="true" role="button" tabindex="0">الميزوسفير</div>
-                    <div class="draggable-item" id="layer-stratosphere" data-id="layer-stratosphere" draggable="true" role="button" tabindex="0">الستراتوسفير</div>
+                    <button type="button" class="draggable-item" id="layer-exosphere" data-id="layer-exosphere" onclick="selectAtmosphereLayer(this)">الإكسوسفير</button>
+                    <button type="button" class="draggable-item" id="layer-troposphere" data-id="layer-troposphere" onclick="selectAtmosphereLayer(this)">التروبوسفير</button>
+                    <button type="button" class="draggable-item" id="layer-thermosphere" data-id="layer-thermosphere" onclick="selectAtmosphereLayer(this)">الثرموسفير</button>
+                    <button type="button" class="draggable-item" id="layer-mesosphere" data-id="layer-mesosphere" onclick="selectAtmosphereLayer(this)">الميزوسفير</button>
+                    <button type="button" class="draggable-item" id="layer-stratosphere" data-id="layer-stratosphere" onclick="selectAtmosphereLayer(this)">الستراتوسفير</button>
                 </div>
 
                 <div style="display: flex; gap: 8px; margin-top: 5px;">
@@ -1879,121 +1899,78 @@
         const items = document.querySelectorAll('.draggable-item');
         const slots = document.querySelectorAll('.drop-slot');
 
-        // Pointer Events: تعمل على Safari الحديث وChrome/Edge
-        if (window.PointerEvent) {
-            items.forEach(item => {
-                item.addEventListener('pointerup', function (event) {
-                    if (draggedAtmosphereItem) return;
-                    event.preventDefault();
-                    event.stopPropagation();
-                    selectAtmosphereLayer(this);
-                }, { passive: false });
-            });
+        // على الكمبيوتر فقط: نفعّل السحب والإفلات.
+        // على iPhone/Safari يعتمد الترتيب على أزرار click الأصلية فقط.
+        const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
 
-            slots.forEach(slot => {
-                slot.addEventListener('pointerup', function (event) {
-                    if (draggedAtmosphereItem) return;
-                    event.preventDefault();
-                    event.stopPropagation();
-                    handleAtmosphereSlotActivation(this);
-                }, { passive: false });
-            });
-        } else {
-            // دعم احتياطي لسفاري الأقدم
+        if (!isTouchDevice) {
             items.forEach(item => {
-                item.addEventListener('click', function (event) {
-                    event.preventDefault();
-                    selectAtmosphereLayer(this);
+                item.setAttribute('draggable', 'true');
+
+                item.addEventListener('dragstart', function (event) {
+                    if (this.classList.contains('used')) {
+                        event.preventDefault();
+                        return;
+                    }
+
+                    draggedAtmosphereItem = this;
+                    clearAtmosphereSelection();
+
+                    try {
+                        event.dataTransfer.effectAllowed = 'move';
+                        event.dataTransfer.setData('text/plain', this.dataset.id);
+                    } catch (e) {}
+                });
+
+                item.addEventListener('dragend', function () {
+                    setTimeout(() => {
+                        draggedAtmosphereItem = null;
+                    }, 60);
+
+                    document.querySelectorAll('.drop-slot').forEach(slot => {
+                        slot.classList.remove('target-ready');
+                    });
                 });
             });
 
             slots.forEach(slot => {
-                slot.addEventListener('click', function (event) {
+                slot.addEventListener('dragover', function (event) {
                     event.preventDefault();
-                    handleAtmosphereSlotActivation(this);
+                    this.classList.add('target-ready');
+
+                    try {
+                        event.dataTransfer.dropEffect = 'move';
+                    } catch (e) {}
+                });
+
+                slot.addEventListener('dragleave', function () {
+                    this.classList.remove('target-ready');
+                });
+
+                slot.addEventListener('drop', function (event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    this.classList.remove('target-ready');
+
+                    let item = draggedAtmosphereItem;
+
+                    if (!item) {
+                        try {
+                            const id = event.dataTransfer.getData('text/plain');
+                            item = getAtmosphereItemById(id);
+                        } catch (e) {}
+                    }
+
+                    if (item) {
+                        placeAtmosphereLayer(item, this);
+                    }
+
+                    setTimeout(() => {
+                        draggedAtmosphereItem = null;
+                    }, 60);
                 });
             });
         }
-
-        // لوحة المفاتيح + السحب على الكمبيوتر
-        items.forEach(item => {
-            item.addEventListener('keydown', function (event) {
-                if (event.key === 'Enter' || event.key === ' ') {
-                    event.preventDefault();
-                    selectAtmosphereLayer(this);
-                }
-            });
-
-            item.addEventListener('dragstart', function (event) {
-                if (this.classList.contains('used')) {
-                    event.preventDefault();
-                    return;
-                }
-
-                draggedAtmosphereItem = this;
-                clearAtmosphereSelection();
-
-                try {
-                    event.dataTransfer.effectAllowed = 'move';
-                    event.dataTransfer.setData('text/plain', this.dataset.id);
-                } catch (e) {}
-            });
-
-            item.addEventListener('dragend', function () {
-                setTimeout(() => {
-                    draggedAtmosphereItem = null;
-                }, 60);
-
-                document.querySelectorAll('.drop-slot').forEach(slot => {
-                    slot.classList.remove('target-ready');
-                });
-            });
-        });
-
-        slots.forEach(slot => {
-            slot.addEventListener('keydown', function (event) {
-                if (event.key === 'Enter' || event.key === ' ') {
-                    event.preventDefault();
-                    handleAtmosphereSlotActivation(this);
-                }
-            });
-
-            slot.addEventListener('dragover', function (event) {
-                event.preventDefault();
-                this.classList.add('target-ready');
-
-                try {
-                    event.dataTransfer.dropEffect = 'move';
-                } catch (e) {}
-            });
-
-            slot.addEventListener('dragleave', function () {
-                this.classList.remove('target-ready');
-            });
-
-            slot.addEventListener('drop', function (event) {
-                event.preventDefault();
-                event.stopPropagation();
-                this.classList.remove('target-ready');
-
-                let item = draggedAtmosphereItem;
-
-                if (!item) {
-                    try {
-                        const id = event.dataTransfer.getData('text/plain');
-                        item = getAtmosphereItemById(id);
-                    } catch (e) {}
-                }
-
-                if (item) {
-                    placeAtmosphereLayer(item, this);
-                }
-
-                setTimeout(() => {
-                    draggedAtmosphereItem = null;
-                }, 60);
-            });
-        });
     }
 
     function resetAtmosphereOrder() {
