@@ -304,37 +304,39 @@
         .atmosphere-challenge-wrapper {
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 15px;
             width: 100%;
-            max-width: 1100px;
+            max-width: 950px;
             align-items: center;
-            padding: 10px;
+            padding: 5px;
         }
 
         .drop-zones {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
-            gap: 10px;
+            gap: 8px;
             width: 100%;
             direction: rtl;
         }
 
         .drop-slot {
-            min-height: 85px;
+            min-height: 80px;
+            max-height: 95px;
             border: 2px dashed var(--neon-blue);
             background: rgba(0, 243, 255, 0.08);
-            border-radius: 12px;
+            border-radius: 10px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: #cbd5e1;
             font-weight: bold;
             box-shadow: 0 0 15px rgba(0, 243, 255, 0.1);
             transition: all 0.3s;
             text-align: center;
-            padding: 6px;
+            padding: 4px;
+            overflow: hidden;
         }
 
         .drop-slot.hovered {
@@ -347,26 +349,38 @@
 
         .drag-container {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             flex-wrap: wrap;
             justify-content: center;
             width: 100%;
-            min-height: 65px;
+            min-height: 55px;
         }
 
         .draggable-item {
-            padding: 10px 16px;
+            padding: 8px 12px;
             background: linear-gradient(135deg, rgba(0, 243, 255, 0.25) 0%, rgba(15, 23, 42, 0.95) 100%);
             border: 2px solid var(--neon-blue);
-            box-shadow: 0 0 20px rgba(0, 243, 255, 0.3);
-            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.3);
+            border-radius: 8px;
             cursor: grab;
             font-weight: bold;
-            font-size: 0.95rem;
+            font-size: 0.85rem;
             color: #fff;
             touch-action: none;
             transition: border-color 0.2s, box-shadow 0.2s;
             text-align: center;
+            max-width: 100%;
+            white-space: nowrap;
+        }
+
+        /* تنسيق موحد وصغير للعنصر عندما يكون داخل مربع الإفلات لكي لا يتجاوز حجم الصفحة أو الصندوق */
+        .drop-slot .draggable-item {
+            width: 100%;
+            padding: 4px 6px;
+            font-size: 0.78rem;
+            margin: 0;
+            box-shadow: none;
+            background: rgba(0, 243, 255, 0.35);
         }
 
         .draggable-item:active {
@@ -375,8 +389,8 @@
 
         .draggable-item.selected-touch {
             border-color: var(--neon-green);
-            box-shadow: 0 0 25px var(--neon-green);
-            transform: scale(1.05);
+            box-shadow: 0 0 20px var(--neon-green);
+            transform: scale(1.03);
         }
 
         .badges-container {
@@ -884,12 +898,12 @@
         </div>
     </section>
 
-    <!-- SLIDE 2: التحدي المتوافق تماماً مع الأيفون والأجهزة اللوحية (لمس + سحب) -->
+    <!-- SLIDE 2 -->
     <section id="slide-2" class="slide">
         <canvas id="canvas-slide2" class="space-bg"></canvas>
         <div class="content-layer">
             <div class="atmosphere-challenge-wrapper">
-                <h3 style="margin-bottom: 5px; font-size: clamp(1rem, 2.2vw, 1.3rem); text-align: center;">🧪 التحدي: المس أو اسحب ورتّب طبقات الغلاف الجوي من سطح الأرض إلى الفضاء</h3>
+                <h3 style="margin-bottom: 5px; font-size: clamp(0.95rem, 2vw, 1.2rem); text-align: center;">🧪 التحدي: المس أو اسحب ورتّب طبقات الغلاف الجوي من سطح الأرض إلى الفضاء</h3>
                 
                 <div class="drop-zones" id="drop-zones">
                     <div class="drop-slot" data-index="0">1.<br>القريبة للأرض</div>
@@ -907,10 +921,10 @@
                     <div class="draggable-item" id="layer-stratosphere">الستراتوسفير</div>
                 </div>
 
-                <div style="margin-top: 10px;">
+                <div style="margin-top: 5px;">
                     <button class="btn-action" onclick="checkAtmosphereOrder()">التحقق من الترتيب 🧪</button>
                 </div>
-                <div id="slide2-status" style="margin-top: 8px; font-weight: bold; height: 25px; font-size: 0.95rem;"></div>
+                <div id="slide2-status" style="margin-top: 5px; font-weight: bold; height: 22px; font-size: 0.9rem;"></div>
             </div>
         </div>
     </section>
@@ -1662,24 +1676,20 @@
     let draggedItem = null;
     let selectedTouchItem = null;
 
-    // نظام سحب وإفلات هجين متوافق تماماً مع الحواسب (موس) والأيفون والأجهزة اللوحية (لمس)
     function initStandardDragAndDrop() {
         const items = document.querySelectorAll('.draggable-item');
         const slots = document.querySelectorAll('.drop-slot');
         const container = document.getElementById('drag-container');
 
         items.forEach(item => {
-            // دعم الماوس التقليدي
             item.setAttribute('draggable', 'true');
             item.addEventListener('dragstart', (e) => {
                 draggedItem = item;
                 e.dataTransfer.setData('text/plain', item.id);
             });
 
-            // نظام النقر البديل والسحب باللمس للأيفون والأجهزة اللوحية
             item.addEventListener('click', (e) => {
                 e.stopPropagation();
-                // إلغاء التحديد السابق إن وجد
                 document.querySelectorAll('.draggable-item').forEach(i => i.classList.remove('selected-touch'));
                 
                 if (selectedTouchItem === item) {
@@ -1691,7 +1701,6 @@
                 }
             });
 
-            // دعم اللمس المباشر (Touch Events) للأيفون والأجهزة الذكية
             item.addEventListener('touchstart', (e) => {
                 e.stopPropagation();
                 draggedItem = item;
@@ -1699,7 +1708,6 @@
         });
 
         slots.forEach(slot => {
-            // دعم الماوس
             slot.addEventListener('dragover', (e) => {
                 e.preventDefault();
                 slot.classList.add('hovered');
@@ -1721,7 +1729,6 @@
                 }
             });
 
-            // دعم النقر على المربع في الآيفون والأجهزة اللوحية لوضع العنصر المحدد بشهادة اللمس
             slot.addEventListener('click', () => {
                 if (selectedTouchItem) {
                     if (slot.children.length > 0) {
@@ -1732,7 +1739,6 @@
                     selectedTouchItem = null;
                     playBeep(800, 'sine', 0.08);
                 } else if (slot.children.length > 0) {
-                    // إرجاع العنصر إلى الحاوية الأساسية عند الضغط عليه داخل المربع مجدداً
                     container.appendChild(slot.children[0]);
                     playBeep(400, 'sine', 0.05);
                 }
